@@ -40,10 +40,10 @@
 | [04](#4-gpo--bloqueio-de-painel-de-controle) | GPO — Bloqueio de Painel de Controle | ✅ Feito |
 | [05](#5-gpo--bloqueio-de-usb-dlp) | GPO — Bloqueio de USB (DLP) | ✅ Feito |
 | [06](#6-servidor-de-arquivos-e-permissões-ntfs) | Servidor de Arquivos e Permissões NTFS | ✅ Feito |
-| [07](#7-segundo-dc-e-alta-disponibilidade) | Segundo DC e Alta Disponibilidade | ✅ Feito |
-| [08](#8-topologia-multi-site-e-replicação) | Topologia Multi-Site e Replicação | ✅ Feito |
-| [09](#9-hardening--protected-users-e-auditoria) | Hardening — Protected Users e Auditoria | ✅ Feito |
-| [10](#10-controle-de-acesso-remoto-rdp-via-gpo) | Controle de Acesso Remoto (RDP via GPO) | ✅ Feito |
+| [07](#7-segundo-dc-e-alta-disponibilidade) | Segundo DC e Alta Disponibilidade | 🔄 Em andamento |
+| [08](#8-topologia-multi-site-e-replicação) | Topologia Multi-Site e Replicação | 🔄 Em andamento |
+| [09](#9-hardening--protected-users-e-auditoria) | Hardening — Protected Users e Auditoria | 🔄 Em andamento |
+| [10](#10-controle-de-acesso-remoto-rdp-via-gpo) | Controle de Acesso Remoto (RDP via GPO) | 🔄 Em andamento |
 | [11](#próximos-passos) | Próximos Passos | 🔄 Em andamento |
 
 ---
