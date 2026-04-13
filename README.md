@@ -21,10 +21,10 @@
 | Componente | Detalhe |
 |---|---|
 | Hipervisor | Hyper-V (Windows 10 — host) |
-| DC Principal | Windows Server 2025 — `SEU_HOSTNAME` (`10.10.10.10`) |
-| DC Secundário | Windows Server 2025 — `SEU_HOSTNAME_2` (`10.10.10.20`) / RID Master |
+| DC Principal | Windows Server 2025 — `MBR0` (`10.10.10.10`) |
+| DC Secundário | Windows Server 2025 — `MBR1` (`10.10.10.20`) / RID Master |
 | Cliente | Windows 10 (ingressado no domínio) |
-| Domínio | `seudominio.internal` |
+| Domínio | `matriz.internal` |
 | Serviços | AD DS, DNS, GPO, File Server (NTFS/SMB), FSMO Roles |
 | Automação | PowerShell + CSV |
 
@@ -32,23 +32,28 @@
 
 ## 📋 Índice
 
-| # | O que está documentado | Status |
+| Fase | Item | Status |
 |---|---|---|
-| [01](#1-estrutura-de-ous) | Estrutura de Unidades Organizacionais (OUs) | ✅ Feito |
-| [02](#2-grupos-de-segurança--metodologia-agdlp) | Grupos de Segurança — Metodologia AGDLP | ✅ Feito |
-| [03](#3-automação-de-usuários-via-powershell) | Automação de Usuários via PowerShell | ✅ Feito |
-| [04](#4-gpo--bloqueio-de-painel-de-controle) | GPO — Bloqueio de Painel de Controle | ✅ Feito |
-| [05](#5-gpo--bloqueio-de-usb-dlp) | GPO — Bloqueio de USB (DLP) | ✅ Feito |
-| [06](#6-servidor-de-arquivos-e-permissões-ntfs) | Servidor de Arquivos e Permissões NTFS | ✅ Feito |
-| [07](#7-segundo-dc-e-alta-disponibilidade) | Segundo DC e Alta Disponibilidade | 🔄 Em andamento |
-| [08](#8-topologia-multi-site-e-replicação) | Topologia Multi-Site e Replicação | 🔄 Em andamento |
-| [09](#9-hardening--protected-users-e-auditoria) | Hardening — Protected Users e Auditoria | 🔄 Em andamento |
-| [10](#10-controle-de-acesso-remoto-rdp-via-gpo) | Controle de Acesso Remoto (RDP via GPO) | 🔄 Em andamento |
-| [11](#próximos-passos) | Próximos Passos | 🔄 Em andamento |
+| 🟢 Fase 1 | [Estrutura de OUs](#1-estrutura-de-ous) | ✅ Feito |
+| 🟢 Fase 1 | [Automação de Usuários via PowerShell](#2-automação-de-usuários-via-powershell) | ✅ Feito |
+| 🟢 Fase 1 | [Alta Disponibilidade — DC Secundário (MBR1)](#3-alta-disponibilidade--dc-secundário-mbr1) | ⚠️ Em documentação |
+| 🟢 Fase 1 | [Design Multi-Site e Replicação](#4-design-multi-site-e-replicação) | ⚠️ Em documentação |
+| 🟢 Fase 1 | [Gestão de Roles FSMO](#5-gestão-de-roles-fsmo) | ⚠️ Em documentação |
+| 🟢 Fase 1 | [Troubleshooting de Rede](#6-troubleshooting-de-rede) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Grupos de Segurança — Metodologia AGDLP](#7-grupos-de-segurança--metodologia-agdlp) | ✅ Feito |
+| 🔐 Fase 2 | [GPO — Bloqueio de Painel de Controle](#8-gpo--bloqueio-de-painel-de-controle) | ✅ Feito |
+| 🔐 Fase 2 | [GPO — Bloqueio de USB (DLP)](#9-gpo--bloqueio-de-usb-dlp) | ✅ Feito |
+| 🔐 Fase 2 | [Hardening — Protected Users](#10-hardening--protected-users) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Atribuição de Direitos — Deny Logon as a Service](#11-atribuição-de-direitos--deny-logon-as-a-service) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Auditoria Avançada de Eventos](#12-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#13-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
+| 📂 Fase 3 | [Servidor de Arquivos e Permissões NTFS](#14-servidor-de-arquivos-e-permissões-ntfs) | ✅ Feito |
+| 📂 Fase 3 | [Mapeamento Automático de Unidades via GPO](#15-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
+| ☁️ Fase 4 | [Próximos Passos](#próximos-passos) | 🔄 Planejado |
 
 ---
 
-## Implementação
+## 🟢 Fase 1: Fundação, Topologia e Automação
 
 ---
 
@@ -69,21 +74,7 @@ O primeiro passo foi largar os containers padrão do Windows e criar uma hierarq
 
 ---
 
-### 2. Grupos de Segurança — Metodologia AGDLP
-
-Optei por grupos globais em vez de adicionar usuários direto nas permissões. O motivo é simples: quando alguém sai da empresa, você remove do grupo e acabou — não precisa caçar permissão por permissão.
-
-- **Grupo criado:** `G_TI_AcessoFull` (escopo: Global)
-- O usuário `robson.silva` foi movido para a OU correta e vinculado ao grupo, não à pasta diretamente.
-
-| Evidência | Descrição |
-|---|---|
-| ![Membros do Grupo](img/MembroDe.png) | Usuário vinculado ao grupo |
-| ![Grupo G_TI](img/MembroGTI.png) | Configuração do grupo G_TI_AcessoFull |
-
----
-
-### 3. Automação de Usuários via PowerShell
+### 2. Automação de Usuários via PowerShell
 
 Criar usuário por usuário no ADUC não escala. Escrevi um script que lê um CSV (simulando exportação do RH) e provisiona as contas automaticamente nas OUs certas.
 
@@ -101,7 +92,63 @@ O script lê o CSV linha por linha, identifica o campo `Departamento` e cria o u
 
 ---
 
-### 4. GPO — Bloqueio de Painel de Controle
+### 3. Alta Disponibilidade — DC Secundário (MBR1)
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+Um único DC é um ponto único de falha. Se ele cair, ninguém autentica. A solução foi promover o `MBR1` ao papel de Domain Controller secundário, garantindo que o serviço de identidade continue operando mesmo se o DC principal ficar indisponível.
+
+- **DC Principal:** `MBR0` (`10.10.10.10`) — DC primário e DNS Server
+- **DC Secundário:** `MBR1` (`10.10.10.20`) — DC de redundância + RID Master
+
+---
+
+### 4. Design Multi-Site e Replicação
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+Criação de Site no AD para simular latência e controlar o tráfego de replicação entre localidades. Sem isso, o AD replica sem critério e pode gerar congestionamento em links com baixa banda.
+
+- **Sub-rede associada:** `172.16.1.0/24`
+- **Objetivo:** garantir que a autenticação de usuários aconteça sempre pelo DC mais próximo geograficamente
+
+---
+
+### 5. Gestão de Roles FSMO
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+As roles FSMO controlam operações críticas do AD que não podem ter conflito entre DCs. A função **RID Master** foi transferida estrategicamente para o `MBR1` para distribuir a carga operacional entre os controladores.
+
+---
+
+### 6. Troubleshooting de Rede
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+Durante a implementação do segundo DC, surgiram falhas de resolução de nomes e conectividade entre os servidores. O diagnóstico foi feito via `nslookup`, `ping` e análise dos gateways configurados nas interfaces de rede.
+
+---
+
+## 🔐 Fase 2: Segurança, Hardening e Governança (GPO)
+
+---
+
+### 7. Grupos de Segurança — Metodologia AGDLP
+
+Optei por grupos globais em vez de adicionar usuários direto nas permissões. O motivo é simples: quando alguém sai da empresa, você remove do grupo e acabou — não precisa caçar permissão por permissão.
+
+- **Grupo criado:** `G_TI_AcessoFull` (escopo: Global)
+- O usuário `robson.silva` foi movido para a OU correta e vinculado ao grupo, não à pasta diretamente.
+
+| Evidência | Descrição |
+|---|---|
+| ![Membros do Grupo](img/MembroDe.png) | Usuário vinculado ao grupo |
+| ![Grupo G_TI](img/MembroGTI.png) | Configuração do grupo G_TI_AcessoFull |
+
+---
+
+### 8. GPO — Bloqueio de Painel de Controle
 
 Primeira política de hardening aplicada. O objetivo é impedir que o usuário final mexa nas configurações do SO — principal causa de chamados por desconfiguração.
 
@@ -118,7 +165,7 @@ Primeira política de hardening aplicada. O objetivo é impedir que o usuário f
 
 ---
 
-### 5. GPO — Bloqueio de USB (DLP)
+### 9. GPO — Bloqueio de USB (DLP)
 
 Pen drive é uma das formas mais simples de vazar dados ou introduzir malware. Essa política resolve no nível de máquina — não importa quem fizer logon.
 
@@ -134,7 +181,43 @@ Pen drive é uma das formas mais simples de vazar dados ou introduzir malware. E
 
 ---
 
-### 6. Servidor de Arquivos e Permissões NTFS
+### 10. Hardening — Protected Users
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+**Protected Users** é um grupo especial do AD que força o uso de Kerberos e elimina cache de credenciais NTLM. Contas administrativas incluídas nele não funcionam com protocolos de autenticação legados — o que elimina uma classe inteira de ataques de roubo de credencial.
+
+---
+
+### 11. Atribuição de Direitos — Deny Logon as a Service
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+A política **"Deny Logon as a Service"** aplicada a contas de administrador impede que um atacante use uma conta comprometida para registrar um serviço malicioso e manter persistência no ambiente.
+
+---
+
+### 12. Auditoria Avançada de Eventos
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+Sem auditoria ativa, qualquer alteração no diretório passa despercebida. Foram ativados logs de eventos para gestão de contas — criação, exclusão e alteração de senha ficam registradas com usuário, horário e estação de origem.
+
+---
+
+### 13. GPO — Account Lockout e Política de Senhas
+
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+Política de bloqueio de conta após tentativas de logon inválidas e exigência de complexidade mínima de senha. Duas medidas básicas que eliminam boa parte dos ataques de força bruta contra o diretório.
+
+---
+
+## 📂 Fase 3: Serviços de Arquivos e Produtividade
+
+---
+
+### 14. Servidor de Arquivos e Permissões NTFS
 
 A lógica aqui é o modelo das "duas portas": compartilhamento (Share) aberto para o grupo de TI, e o controle real acontece na camada NTFS.
 
@@ -155,71 +238,31 @@ A lógica aqui é o modelo das "duas portas": compartilhamento (Share) aberto pa
 
 ---
 
-### 7. Segundo DC e Alta Disponibilidade
+### 15. Mapeamento Automático de Unidades via GPO
 
-> 📸 *Evidências desta seção em `/docs`*
-> 
-> ⚠️ **[PREENCHER: adicione as imagens e detalhes desta implementação]**
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
-Um único DC é um ponto único de falha. Se ele cair, ninguém autentica. A solução foi promover um segundo servidor ao papel de Domain Controller e transferir a função **RID Master** para ele.
-
-- **DC Principal:** `SEU_HOSTNAME` (`10.10.10.10`) — DC primário e DNS Server
-- **DC Secundário:** `SEU_HOSTNAME_2` (`10.10.10.20`) — DC de redundância + RID Master
-- **Troubleshooting realizado:** falhas de resolução de nomes corrigidas via `nslookup` e diagnóstico de gateway
+Em vez de mapear a unidade de rede manualmente em cada estação, a GPO faz isso automaticamente no logon. A distribuição é por departamento — usuários de TI recebem a unidade de TI, usuários de ADM recebem a deles, sem intervenção manual.
 
 ---
 
-### 8. Topologia Multi-Site e Replicação
-
-> ⚠️ **[PREENCHER: adicione as imagens e detalhes desta implementação]**
-
-Criação de Site no AD para simular latência e controlar o tráfego de replicação entre localidades. Sem isso, o AD replica sem critério e gera congestionamento em links lentos.
-
-- **Site criado:** `SEU_SITE_NAME`
-- **Sub-rede associada:** `172.16.1.0/24`
-- **Objetivo:** autenticação de usuários sempre pelo DC mais próximo geograficamente
-
----
-
-### 9. Hardening — Protected Users e Auditoria
-
-> ⚠️ **[PREENCHER: adicione as imagens e detalhes desta implementação]**
-
-**Protected Users** é um grupo especial do AD que força o uso de Kerberos e elimina cache de credenciais NTLM. Contas administrativas incluídas nele não funcionam com protocolos de autenticação legados.
-
-Também foi ativada a política **"Deny Logon as a Service"** para contas admin — impede que malware use uma conta comprometida para se registrar como serviço e persistir no sistema.
-
-**Auditoria ativada:**
-- Eventos de gestão de contas (criação, exclusão, alteração de senha)
-- Rastreabilidade total de modificações no diretório
-
----
-
-### 10. Controle de Acesso Remoto (RDP via GPO)
-
-> ⚠️ **[PREENCHER: adicione as imagens e detalhes desta implementação]**
-
-RDP aberto para todos é risco de movimentação lateral. A GPO criada restringe o acesso via Remote Desktop apenas ao grupo de TI autorizado, bloqueando qualquer outra conta — incluindo administradores locais.
-
----
-
-## Próximos Passos
+## ☁️ Próximos Passos
 
 - [x] Estrutura de OUs e grupos de segurança (AGDLP)
-- [x] GPOs de hardening (USB, Painel de Controle)
-- [x] Servidor de Arquivos com permissões NTFS granulares
 - [x] Automação de onboarding via PowerShell
-- [x] Segundo DC e alta disponibilidade
-- [x] Topologia Multi-Site e replicação
-- [x] Protected Users e auditoria de eventos
-- [x] Controle de RDP via GPO
-- [ ] Account Lockout Policy e política de complexidade de senhas
-- [ ] Mapeamento automático de unidades de rede via GPO por departamento
+- [x] Alta disponibilidade — DC secundário (MBR1)
+- [x] Design Multi-Site e controle de replicação
+- [x] Gestão de Roles FSMO
+- [x] Troubleshooting de rede e DNS
+- [x] GPOs de hardening (Painel de Controle e USB)
+- [x] Servidor de Arquivos com permissões NTFS granulares
+- [ ] Hardening — Protected Users e Deny Logon as a Service
+- [ ] Auditoria avançada de eventos de diretório
+- [ ] Account Lockout Policy e complexidade de senhas
+- [ ] Mapeamento automático de unidades de rede via GPO
 - [ ] Avaliação de sincronização com Azure AD (Entra ID)
+- [ ] PowerShell Infrastructure as Code (IaC) para automação total do lab
 
 ---
 
 ## 📂 Estrutura do Repositório
-/docs      → diagramas de rede e evidências de configuração
-/scripts   → scripts PowerShell e arquivos CSV
-/config    → detalhes e backups das GPOs aplicadas
