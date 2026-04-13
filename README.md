@@ -220,3 +220,6 @@ RDP aberto para todos é risco de movimentação lateral. A GPO criada restringe
 ---
 
 ## 📂 Estrutura do Repositório
+/docs      → diagramas de rede e evidências de configuração
+/scripts   → scripts PowerShell e arquivos CSV
+/config    → detalhes e backups das GPOs aplicadas
