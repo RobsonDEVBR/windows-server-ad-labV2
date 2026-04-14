@@ -221,10 +221,13 @@ O usuário Admin Caxambu foi criado e colocado no grupo de Segurança GG-Admins-
 
 ### 11. Delegação de Privilégios (RBAC) e Segregação de Funções
 
-> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+O objetivo da delegação de privilégios é descentralizar a administração para as equipes locais de TI. Ao conceder permissões específicas (como redefinição de senhas e gestão de contas) sem entregar direitos de Domain Admin, aplicamos na prática o Princípio do Menor Privilégio (PoLP) e o modelo RBAC (Controle de Acesso Baseado em Funções), reduzindo drasticamente a superfície de ataque do servidor.
 
-A política **"Deny Logon as a Service"** aplicada a contas de administrador impede que um atacante use uma conta comprometida para registrar um serviço malicioso e manter persistência no ambiente.
-
+| Evidência | Descrição |
+|---|---|
+| ![DC1](img/DC1.png) | Clicando em Delegar Controle na UO `Matriz-Caxambu` |
+| ![DC2](img/DC2.png) | Adicionando o Grupo GG-Admins-Caxambu ao qual usuário Admin-Caxambu pertence  |
+| ![DC3](img/DC3.png) | Configurando Permissões do usuário |
 ---
 
 ### 12. Atribuição de Direitos — Deny Logon as a Service
