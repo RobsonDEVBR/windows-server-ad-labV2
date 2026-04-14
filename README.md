@@ -205,9 +205,16 @@ Pen drive é uma das formas mais simples de vazar dados ou introduzir malware. E
 
 ### 10. Hardening — Protected Users
 
-> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+Foram Criados usuários na UO  `Matriz-Caxambu` (raiz da organização)
+  - `ADM` — políticas e usuários administrativos 
+O usuário Admin Caxambu foi criado e colocado no grupo de Segurança GG-Admins-Caxambu e adicionado ao Grupo Protected Users.
 
 **Protected Users** é um grupo especial do AD que força o uso de Kerberos e elimina cache de credenciais NTLM. Contas administrativas incluídas nele não funcionam com protocolos de autenticação legados — o que elimina uma classe inteira de ataques de roubo de credencial.
+
+| Evidência | Descrição |
+|---|---|
+| ![P1](img/USB1.png) | Usuário e Grupo Criado na UO Matriz-Caxambu ADM |
+| ![P2](img/USB2.png) | Usuário Adicionado ao Grupo de Segurança GG-Admins-Caxambu e Protected Users |
 
 ---
 
