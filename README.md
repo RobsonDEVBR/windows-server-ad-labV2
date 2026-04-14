@@ -44,11 +44,12 @@
 | 🔐 Fase 2 | [GPO — Bloqueio de Painel de Controle](#8-gpo--bloqueio-de-painel-de-controle) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de USB (DLP)](#9-gpo--bloqueio-de-usb-dlp) | ✅ Feito |
 | 🔐 Fase 2 | [Hardening — Protected Users](#10-hardening--protected-users) | ✅ Feito |
-| 🔐 Fase 2 | [Atribuição de Direitos — Deny Logon as a Service](#11-atribuição-de-direitos--deny-logon-as-a-service) | ⚠️ Em documentação |
-| 🔐 Fase 2 | [Auditoria Avançada de Eventos](#12-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
-| 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#13-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
-| 📂 Fase 3 | [Servidor de Arquivos e Permissões NTFS](#14-servidor-de-arquivos-e-permissões-ntfs) | ✅ Feito |
-| 📂 Fase 3 | [Mapeamento Automático de Unidades via GPO](#15-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Delegação de Privilégios (RBAC) e Segregação de Funções](#11-delegação-de-privilégios-(RBAC)-e-segregação-de-funções | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Atribuição de Direitos — Deny Logon as a Service](#12-atribuição-de-direitos--deny-logon-as-a-service) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Auditoria Avançada de Eventos](#13-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#14-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
+| 📂 Fase 3 | [Servidor de Arquivos e Permissões NTFS](#15-servidor-de-arquivos-e-permissões-ntfs) | ✅ Feito |
+| 📂 Fase 3 | [Mapeamento Automático de Unidades via GPO](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | ☁️ Fase 4 | [Próximos Passos](#próximos-passos) | 🔄 Planejado |
 
 ---
@@ -217,8 +218,14 @@ O usuário Admin Caxambu foi criado e colocado no grupo de Segurança GG-Admins-
 | ![P2](img/P2.png) | Usuário Adicionado ao Grupo de Segurança GG-Admins-Caxambu e Protected Users |
 
 ---
+### 11. Delegação de Privilégios (RBAC) e Segregação de Funções
 
-### 11. Atribuição de Direitos — Deny Logon as a Service
+> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+
+A política **"Deny Logon as a Service"** aplicada a contas de administrador impede que um atacante use uma conta comprometida para registrar um serviço malicioso e manter persistência no ambiente.
+
+---
+### 12. Atribuição de Direitos — Deny Logon as a Service
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
@@ -226,7 +233,7 @@ A política **"Deny Logon as a Service"** aplicada a contas de administrador imp
 
 ---
 
-### 12. Auditoria Avançada de Eventos
+### 13. Auditoria Avançada de Eventos
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
@@ -234,7 +241,7 @@ Sem auditoria ativa, qualquer alteração no diretório passa despercebida. Fora
 
 ---
 
-### 13. GPO — Account Lockout e Política de Senhas
+### 14. GPO — Account Lockout e Política de Senhas
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
@@ -246,7 +253,7 @@ Política de bloqueio de conta após tentativas de logon inválidas e exigência
 
 ---
 
-### 14. Servidor de Arquivos e Permissões NTFS
+### 15. Servidor de Arquivos e Permissões NTFS
 
 A lógica aqui é o modelo das "duas portas": compartilhamento (Share) aberto para o grupo de TI, e o controle real acontece na camada NTFS.
 
@@ -267,7 +274,7 @@ A lógica aqui é o modelo das "duas portas": compartilhamento (Share) aberto pa
 
 ---
 
-### 15. Mapeamento Automático de Unidades via GPO
+### 16. Mapeamento Automático de Unidades via GPO
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
@@ -285,6 +292,7 @@ Em vez de mapear a unidade de rede manualmente em cada estação, a GPO faz isso
 - [x] Troubleshooting de rede e DNS
 - [x] GPOs de hardening (Painel de Controle e USB)
 - [x] Servidor de Arquivos com permissões NTFS granulares
+- [x] Delegação de Privilégios (RBAC) e Segregação de Funções
 - [ ] Hardening — Protected Users e Deny Logon as a Service
 - [ ] Auditoria avançada de eventos de diretório
 - [ ] Account Lockout Policy e complexidade de senhas
