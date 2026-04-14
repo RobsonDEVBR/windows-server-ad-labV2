@@ -116,9 +116,13 @@ Criação de Site no AD para simular latência e controlar o tráfego de replica
 
 ### 5. Gestão de Roles FSMO
 
-> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
-
 As roles FSMO controlam operações críticas do AD que não podem ter conflito entre DCs. A função **RID Master** foi transferida estrategicamente para o `MBR1` para distribuir a carga operacional entre os controladores.
+
+| Evidência | Descrição |
+|---|---|
+| ![TFSM01](img/TFSM01.png) | Acessando Transferência dos Operation Masters |
+| ![TFSM02](img/TFSM02.png) | Confirmando transferência |
+| ![TFSM03](img/TFSM03.png) | Confirmando Transferência pelo CMD Usando comando netdom query fsmo |
 
 ---
 

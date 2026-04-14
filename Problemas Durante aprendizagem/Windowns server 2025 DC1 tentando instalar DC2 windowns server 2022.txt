@@ -1,0 +1,6 @@
+Durante aprendizado não sabia que não era possível instalar um servidor 2022 sendo o principal dono do dominio de 2025
+Há opções de deixar o servidor como apenas membro sem promover a DC
+DIMINUIR O NIVEL FUNCIONAL DE UMA FLORESTA DE 2025 para 2022 ou 2016 para aceitar ambos mas Em infraestrutura ha uma regra de que : Você pode subir o nível funcional de uma floresta, mas você não pode rebaixá-lo (downgrade).
+Optei pela rota mais certa de instalar um servidor de mesmo ano 2025 
+imagens
+aprendi as outras rotas 
