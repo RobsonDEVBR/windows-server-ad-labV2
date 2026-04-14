@@ -43,7 +43,7 @@
 | 🔐 Fase 2 | [Grupos de Segurança — Metodologia AGDLP](#7-grupos-de-segurança--metodologia-agdlp) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de Painel de Controle](#8-gpo--bloqueio-de-painel-de-controle) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de USB (DLP)](#9-gpo--bloqueio-de-usb-dlp) | ✅ Feito |
-| 🔐 Fase 2 | [Hardening — Protected Users](#10-hardening--protected-users) | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Hardening — Protected Users](#10-hardening--protected-users) | ✅ Feito |
 | 🔐 Fase 2 | [Atribuição de Direitos — Deny Logon as a Service](#11-atribuição-de-direitos--deny-logon-as-a-service) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [Auditoria Avançada de Eventos](#12-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#13-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
