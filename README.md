@@ -105,13 +105,26 @@ Um único DC é um ponto único de falha. Se ele cair, ninguém autentica. A sol
 
 ### 4. Design Multi-Site e Replicação
 
-> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
-
 Criação de Site no AD para simular latência e controlar o tráfego de replicação entre localidades. Sem isso, o AD replica sem critério e pode gerar congestionamento em links com baixa banda.
 
 - **Sub-rede associada:** `172.16.1.0/24`
 - **Objetivo:** garantir que a autenticação de usuários aconteça sempre pelo DC mais próximo geograficamente
 
+| Evidência | Descrição |
+|---|---|
+| ![SITES1](img/SITES1.png) | Acessando Active Directory Sites and Services |
+| ![SITES3](img/SITES3.png) | Criando novo Site BH |
+| ![SITES2](img/SITES2.png) | Criando Nova Subrede e Associando ao Site BH |
+| ![SITES4](img/SITES4.png) |  |
+| ![SITES5](img/SITES5.png) | Movendo Servidor MBR1 ao Site BH |
+| ![SITES6](img/SITES6.png) | Nova subrede criada para Matriz 10.10.10.0/24 vinculada a rede Matriz |
+> ** Observação**
+> Até o momento, a topologia de **Sites and Services** (Matriz e Filial BH) foi estruturada e validada em nível lógico dentro do Active Directory. O controlador de domínio secundário (`MBR1`) já foi alocado ao Site `BH` para gerenciar a latência e segurar a autenticação local. 
+> **Próximos Passos (Trabalhos Futuros):**
+> Em atualizações futuras deste laboratório, implementarei a segregação física/lógica das redes no hypervisor. O escopo incluirá:
+> * Criação de um Comutador Virtual Privado para isolar a rede `172.16.1.0/24`.
+> * Implantação de um Servidor de Roteamento (Windows Server com RRAS ou Firewall virtual) para atuar como gateway entre a rede da Matriz (`10.x`) e a Filial BH (`172.x`).
+> * Ajuste fino do DNS e rotas estáticas para simular com 100% de fidelidade um link WAN/SD-WAN corporativo.
 ---
 
 ### 5. Gestão de Roles FSMO
