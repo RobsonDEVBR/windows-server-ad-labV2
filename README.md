@@ -44,7 +44,7 @@
 | 🔐 Fase 2 | [GPO — Bloqueio de Painel de Controle](#8-gpo--bloqueio-de-painel-de-controle) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de USB (DLP)](#9-gpo--bloqueio-de-usb-dlp) | ✅ Feito |
 | 🔐 Fase 2 | [Hardening — Protected Users](#10-hardening--protected-users) | ✅ Feito |
-| 🔐 Fase 2 | [Delegação de Privilégios (RBAC) e Segregação de Funções](#11-delegação-de-privilégios-(RBAC)-e-segregação-de-funções | ⚠️ Em documentação |
+| 🔐 Fase 2 | [Delegação de Privilégios (RBAC) e Segregação de Funções](#11-delegação-de-privilégios-(rbac)-e-segregação-de-funções | ⚠️ Em documentação |
 | 🔐 Fase 2 | [Atribuição de Direitos — Deny Logon as a Service](#12-atribuição-de-direitos--deny-logon-as-a-service) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [Auditoria Avançada de Eventos](#13-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#14-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
