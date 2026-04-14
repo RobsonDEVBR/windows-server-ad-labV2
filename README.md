@@ -120,9 +120,9 @@ As roles FSMO controlam operações críticas do AD que não podem ter conflito 
 
 | Evidência | Descrição |
 |---|---|
-| ![TFSM01](img/TFSM01.png) | Acessando Transferência dos Operation Masters |
-| ![TFSM02](img/TFSM02.png) | Confirmando transferência |
-| ![TFSM03](img/TFSM03.png) | Confirmando Transferência pelo CMD Usando comando netdom query fsmo |
+| ![TFSMO1](img/TFSMO1.png) | Acessando Transferência dos Operation Masters |
+| ![TFSMO2](img/TFSMO2.png) | Confirmando transferência |
+| ![TFSMO3](img/TFSMO3.png) | Confirmando Transferência pelo CMD Usando comando netdom query fsmo |
 
 ---
 
