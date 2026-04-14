@@ -66,11 +66,16 @@ O primeiro passo foi largar os containers padrão do Windows e criar uma hierarq
   - `ADM` — políticas e usuários administrativos
   - `TI` — políticas específicas de tecnologia
   - `COMPUTADORES` — objetos de máquina para hardening de estações
+- `BeloHorizonte` (filial)
+  - `ADM` — políticas e usuários administrativos
+  - `TI` — políticas específicas de tecnologia
+  - `COMPUTADORES` — objetos de máquina para hardening de estações
 
 | Evidência | Descrição |
 |---|---|
 | ![Árvore de OUs](img/Arvore1.png) | Visão expandida da hierarquia |
 | ![Árvore de OUs](img/Arvore.png) | Visão no ADUC |
+|![Árvore de OUs](img/UO.png) | BeloHorizonte Filial Visão ADUC |
 
 ---
 
