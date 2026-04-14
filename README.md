@@ -24,7 +24,7 @@
 | DC Principal | Windows Server 2025 — `MBR0` (`10.10.10.10`) |
 | DC Secundário | Windows Server 2025 — `MBR1` (`10.10.10.20`) / RID Master |
 | Cliente | Windows 10 (ingressado no domínio) |
-| Domínio | `matriz.internal` |
+| Domínio | `robson.local` |
 | Serviços | AD DS, DNS, GPO, File Server (NTFS/SMB), FSMO Roles |
 | Automação | PowerShell + CSV |
 
