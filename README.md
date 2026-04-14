@@ -218,6 +218,7 @@ O usuário Admin Caxambu foi criado e colocado no grupo de Segurança GG-Admins-
 | ![P2](img/P2.png) | Usuário Adicionado ao Grupo de Segurança GG-Admins-Caxambu e Protected Users |
 
 ---
+
 ### 11. Delegação de Privilégios (RBAC) e Segregação de Funções
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
@@ -225,6 +226,7 @@ O usuário Admin Caxambu foi criado e colocado no grupo de Segurança GG-Admins-
 A política **"Deny Logon as a Service"** aplicada a contas de administrador impede que um atacante use uma conta comprometida para registrar um serviço malicioso e manter persistência no ambiente.
 
 ---
+
 ### 12. Atribuição de Direitos — Deny Logon as a Service
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
