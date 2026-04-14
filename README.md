@@ -213,8 +213,8 @@ O usuário Admin Caxambu foi criado e colocado no grupo de Segurança GG-Admins-
 
 | Evidência | Descrição |
 |---|---|
-| ![P1](img/USB1.png) | Usuário e Grupo Criado na UO Matriz-Caxambu ADM |
-| ![P2](img/USB2.png) | Usuário Adicionado ao Grupo de Segurança GG-Admins-Caxambu e Protected Users |
+| ![P1](img/P1.png) | Usuário e Grupo Criado na UO Matriz-Caxambu ADM |
+| ![P2](img/P2.png) | Usuário Adicionado ao Grupo de Segurança GG-Admins-Caxambu e Protected Users |
 
 ---
 
