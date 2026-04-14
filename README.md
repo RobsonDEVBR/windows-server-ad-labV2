@@ -37,8 +37,8 @@
 | 🟢 Fase 1 | [Estrutura de OUs](#1-estrutura-de-ous) | ✅ Feito |
 | 🟢 Fase 1 | [Automação de Usuários via PowerShell](#2-automação-de-usuários-via-powershell) | ✅ Feito |
 | 🟢 Fase 1 | [Alta Disponibilidade — DC Secundário (MBR1)](#3-alta-disponibilidade--dc-secundário-mbr1) | ⚠️ Em documentação |
-| 🟢 Fase 1 | [Design Multi-Site e Replicação](#4-design-multi-site-e-replicação) | ⚠️ Em documentação |
-| 🟢 Fase 1 | [Gestão de Roles FSMO](#5-gestão-de-roles-fsmo) | ⚠️ Em documentação |
+| 🟢 Fase 1 | [Design Multi-Site e Replicação](#4-design-multi-site-e-replicação) | ✅ Feito |
+| 🟢 Fase 1 | [Gestão de Roles FSMO](#5-gestão-de-roles-fsmo) | ✅ Feito |
 | 🟢 Fase 1 | [Troubleshooting de Rede](#6-troubleshooting-de-rede) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [Grupos de Segurança — Metodologia AGDLP](#7-grupos-de-segurança--metodologia-agdlp) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de Painel de Controle](#8-gpo--bloqueio-de-painel-de-controle) | ✅ Feito |
