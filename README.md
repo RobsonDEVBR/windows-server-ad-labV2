@@ -39,7 +39,7 @@
 | 🟢 Fase 1 | [Alta Disponibilidade — DC Secundário (MBR1)](#3-alta-disponibilidade--dc-secundário-mbr1) | ⚠️ Em documentação |
 | 🟢 Fase 1 | [Design Multi-Site e Replicação](#4-design-multi-site-e-replicação) | ✅ Feito |
 | 🟢 Fase 1 | [Gestão de Roles FSMO](#5-gestão-de-roles-fsmo) | ✅ Feito |
-| 🟢 Fase 1 | [Troubleshooting de Rede](#6-troubleshooting-de-rede) | ⚠️ Em documentação |
+| 🟢 Fase 1 | [Troubleshooting: Renomeando DCs (Zero Downtime) e Limpeza DNS](./docs/troubleshooting_rename_dc.md) | ✅ Feito |
 | 🔐 Fase 2 | [Grupos de Segurança — Metodologia AGDLP](#7-grupos-de-segurança--metodologia-agdlp) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de Painel de Controle](#8-gpo--bloqueio-de-painel-de-controle) | ✅ Feito |
 | 🔐 Fase 2 | [GPO — Bloqueio de USB (DLP)](#9-gpo--bloqueio-de-usb-dlp) | ✅ Feito |
@@ -145,7 +145,7 @@ As roles FSMO controlam operações críticas do AD que não podem ter conflito 
 
 ---
 
-### 6. Troubleshooting de Rede
+### 6. Troubleshooting: Renomeando DCs (Zero Downtime) e Limpeza DNS(./docs/troubleshooting_rename_dc.md)
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
