@@ -145,7 +145,7 @@ As roles FSMO controlam operações críticas do AD que não podem ter conflito 
 
 ---
 
-### 6. Troubleshooting: Renomeando DCs (Zero Downtime) e Limpeza DNS(./docs/troubleshooting_rename_dc.md)
+### 6. [Troubleshooting: Renomeando DCs (Zero Downtime) e Limpeza DNS](./docs/troubleshooting_rename_dc.md)
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
