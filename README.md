@@ -21,8 +21,8 @@
 | Componente | Detalhe |
 |---|---|
 | Hipervisor | Hyper-V (Windows 10 — host) |
-| DC Principal | Windows Server 2025 — `MBR0` (`10.10.10.10`) |
-| DC Secundário | Windows Server 2025 — `MBR1` (`10.10.10.20`) / RID Master |
+| DC Principal | Windows Server 2025 — `CXB-DC01` (`10.10.10.10`) |
+| DC Secundário | Windows Server 2025 — `CXB-DC02` (`10.10.10.20`) / RID Master |
 | Cliente | Windows 10 (ingressado no domínio) |
 | Domínio | `robson.local` |
 | Serviços | AD DS, DNS, GPO, File Server (NTFS/SMB), FSMO Roles |
