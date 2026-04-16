@@ -60,7 +60,7 @@ net start w32time
 
 # 3. Força a sincronização imediata
 w32tm /resync
-´´´
+---
 | Evidência | Descrição |
 |---|---|
 | ![Mudança 7](img/Mudança7.png) | Relatório dcdiag apontando falha na localização do Time Server (Erro 1355) logo após a renomeação. |
