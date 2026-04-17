@@ -52,7 +52,7 @@
 | 📂 Fase 3 | [Servidor de Arquivos e Permissões NTFS](#15-servidor-de-arquivos-e-permissões-ntfs) | ✅ Feito |
 | 📂 Fase 3 | [Mapeamento Automático de Unidades via GPO](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Print Server e Automação (GPO)](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
-| 📂 Fase 3 | [Expansão&Conectividade:Matriz/Filial(DFS-R,VPN e BranchCache(Otimização))](./docs/fase3-conectividade-filial/fase3-conectividade-filial.md) | ⚠️ Em documentação |
+| 📂 Fase 3 | [Expansão&Conectividade:Matriz/Filial(DFS-R,VPN&BranchCache)](./docs/fase3-conectividade-filial/fase3-conectividade-filial.md) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Gestão e Disaster Recovery (WAC, VSS e Backup Otimizado))](./docs/fase3-disaster-recovery/fase3-disaster-recovery.md) | ⚠️ Em documentação |
 | ☁️ Fase 4 | [Próximos Passos](#próximos-passos) | 🔄 Planejado |
 
