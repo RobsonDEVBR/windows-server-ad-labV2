@@ -306,5 +306,3 @@ Em vez de mapear a unidade de rede manualmente em cada estação, a GPO faz isso
 - [ ] PowerShell Infrastructure as Code (IaC) para automação total do lab
 
 ---
-
-## 📂 Estrutura do Repositório
