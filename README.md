@@ -89,9 +89,9 @@
 | 🔐 Fase 2 | [Auditoria Avançada de Eventos](#13-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#14-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Servidor de Arquivos e Permissões NTFS](#15-servidor-de-arquivos-e-permissões-ntfs) | ✅ Concluído |
-| 📂 Fase 3 | [CXB-FS01 — Storage Spaces (Arquitetura Base)](docs/fase3-storage-governança/fase3-storage-governança.md#2-cxb-fs01--storage-spaces-arquitetura-base) | ✅ Concluído |
-| 📂 Fase 3 | [Dedup e DFS Namespaces](docs/fase3-storage-governança/fase3-storage-governança.md#3-dedup-e-dfs-namespaces) | ✅ Concluído |
-| 📂 Fase 3 | [Governança: FSRM, NTFS e ABE](docs/fase3-storage-governança/fase3-storage-governança.md#4-governança-fsrm-ntfs-e-abe) | ✅ Concluído |
+| 📂 Fase 3 | [Fase 1: Arquitetura Base de Armazenamento (Storage Spaces)](docs/fase3-storage-governança/fase3-storage-governança.md#fase-1-arquitetura-base-de-armazenamento-storage-spaces) | ✅ Concluído |
+| 📂 Fase 3 | [Fase 2: Estrutura de Dados e Otimização (Dedup e DFS-N)](docs/fase3-storage-governança/fase3-storage-governança.md#fase-2-estrutura-de-dados-e-otimização-dedup-e-dfs-n) | ✅ Concluído |
+| 📂 Fase 3 | [Fase 3: Governança e Segurança (FSRM, NTFS e ABE)](docs/fase3-storage-governança/fase3-storage-governança.md#fase-3-governança-e-segurança-fsrm-ntfs-e-abe) | ✅ Concluído |
 | 📂 Fase 3 | [Mapeamento Automático de Unidades via GPO](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Print Server e Automação (GPO)](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Conectividade Matriz/Filial (DFS-R, VPN & BranchCache)](docs/fase3-conectividade-filial/fase3-conectividade-filial.md) | ⚠️ Em documentação |
