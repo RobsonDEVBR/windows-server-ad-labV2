@@ -80,5 +80,51 @@ Abaixo, detalho o processo de criação e as decisões arquiteturais tomadas dur
 
 ## 2. Estrutura de Dados e Otimização (Dedup e DFS-N)
 
+Nesta segunda fase, transformamos o storage bruto da Fase 1 em um serviço de arquivos inteligente. O objetivo foi maximizar a eficiência do disco e criar uma camada de abstração que permite que a infraestrutura cresça sem impactar a experiência do usuário final.
+
+---
+
+### 2.1. Instalação de Roles e Recursos Críticos
+<img src="img/10.png" width="800">
+
+> **Provisionamento de Roles:** Instalação das funcionalidades de **Data Deduplication**, **DFS Namespaces**, **DFS Replication** (preparando para a filial BH) e o **File Server Resource Manager (FSRM)**. Essa stack compõe o núcleo de um servidor de arquivos corporativo moderno.
+
+---
+
+### 2.2. Otimização de Storage: Data Deduplication
+<img src="img/11.png" width="800">
+
+> **Seleção do Volume Alvo:** A desduplicação foi aplicada exclusivamente no volume **E: (Dados-CXB)**. Ao isolar os dados do sistema operacional (C:), garantimos que o processo de otimização não gere overhead no kernel do Windows.
+
+<img src="img/12.png" width="800">
+
+> **Agendamento Inteligente (Deduplication Schedule):**
+> * **Background Optimization:** Ativada para processamento contínuo em baixa prioridade.
+> * **Throughput Optimization:** Configurada para as **02:00 AM** com duração de 6 horas. 
+> * **Justificativa:** Esta "faxina pesada" ocorre na janela de menor uso da rede (madrugada), garantindo que a CPU do servidor esteja 100% disponível para os usuários durante o horário comercial.
+
+---
+
+### 2.3. Abstração de Rede: DFS Namespaces (DFS-N)
+<img src="img/13.png" width="800">
+
+> O **Distributed File System (DFS)** foi implementado para criar um caminho universal, escondendo a complexidade do hardware físico atrás de um nome lógico baseado no domínio.
+
+<img src="img/15.png" width="800">
+
+> **Decisão Arquitetural Crítica (Edit Settings):** Durante a criação do Namespace, o caminho padrão sugerido pelo Windows (`C:\DFSRoots`) foi alterado manualmente para **`E:\Arquivos`**.
+> * **Por que isso é importante?** Se mantivéssemos no disco C:, ignoraríamos todo o Storage Pool e a Desduplicação configurada. Ao apontar para o disco E:, forçamos o tráfego de dados para a camada de armazenamento otimizada e segura.
+> * **Permissões de Share:** Definidas como *Administrators Full / Users Read-Write*, delegando o controle restritivo para a camada NTFS (Fase 3).
+
+<img src="img/16.png" width="800">
+
+> **Namespace Baseado em Domínio:** Foi selecionado o modo de domínio (`\\robson.local\Arquivos`). Isso permite que, no futuro, se o servidor físico `CXB-FS01` for substituído ou se adicionarmos um servidor em Belo Horizonte, o usuário continue acessando o mesmo caminho, sem nunca precisar remapear unidades de rede.
+
+---
+
+### 2.4. Validação do Caminho Universal
+<img src="img/18.png" width="800">
+
+> **Resultado Final:** O Namespace está ativo e saudável. Agora, qualquer dispositivo no domínio `robson.local` acessa a estrutura centralizada através de um único ponto de entrada, independentemente de onde os dados estejam fisicamente armazenados.
 
 ## 3. Governança e Segurança (FSRM, NTFS e ABE)
