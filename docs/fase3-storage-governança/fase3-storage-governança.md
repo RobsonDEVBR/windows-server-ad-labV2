@@ -181,5 +181,7 @@ Nesta fase, implementamos a "blindagem" do servidor. O foco saiu da infraestrutu
 > **Auditoria e Alerta (Event Log):** Configuramos a política para que toda tentativa de violação (ex: usuário tentando salvar um vírus ou um filme) gere um aviso no **Windows Event Log**. Isso permite monitoramento proativo via ferramentas de SIEM ou análise manual da TI.
 
 <img src="img/28.png" width="800">
+<img src="img/29.png" width="800">
 
-> **Aplicação na Raiz (Cascata):** A regra final foi aplicada na raiz `E:\Arquivos`. Por herança do FSRM, todas as subpastas atuais e futuras estarão automaticamente protegidas por essa política, garantindo que nenhum "ponto cego" de segurança exista no servidor.
+> **Aplicação em Cascata (Root Protection):** > * **Ação Final:** A política de triagem foi aplicada na raiz `E:\Arquivos`. 
+> * **Vantagem Arquitetural:** Ao aplicar na raiz utilizando o template customizado, todas as subpastas atuais e futuras herdam automaticamente a proteção. O servidor torna-se uma "fortaleza" onde o sistema de arquivos atua como a primeira linha de defesa contra ataques de criptografia de dados.
