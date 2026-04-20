@@ -65,8 +65,8 @@
 
 | Site | Sub-rede | Servidores |
 |------|----------|-----------|
-| Matriz-Caxambu | `10.10.10.0/24` | `CXB-DC01`, `CXB-FS01`, `WIN10` |
-| BeloHorizonte | `172.16.1.0/24` | `CXB-DC02` |
+| Matriz-Caxambu | `10.10.10.0/24` | `CXB-DC01`, `CXB-FS01`, `WIN10`,`CXB-DC02` |
+| BeloHorizonte | `172.16.1.0/24` |  |
 
 ---
 
