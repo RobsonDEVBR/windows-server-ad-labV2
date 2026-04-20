@@ -537,7 +537,6 @@ As cotas foram criadas a partir de um **template**, não configuradas diretament
 | Evidência | Descrição |
 |-----------|-----------|
 | [![Storage 24](docs/fase3-storage-governança/img/24.png)](docs/fase3-storage-governança/img/24.png) | Hard Quota de 10GB aplicada na pasta `ADM` via template |
-| [![Storage 25](docs/fase3-storage-governança/img/25.png)](docs/fase3-storage-governança/img/25.png) | Template de quota configurado |
 
 #### Triagem de Arquivos — File Screening
 
@@ -555,7 +554,8 @@ A política foi aplicada na **raiz** de `E:\Arquivos`, não pasta por pasta. Iss
 
 | Evidência | Descrição |
 |-----------|-----------|
-| [![Storage 26](docs/fase3-storage-governança/img/26.png)](docs/fase3-storage-governança/img/26.png) | File Group com extensões de mídia e executáveis bloqueados |
+| [![Storage 25](docs/fase3-storage-governança/img/25.png)](docs/fase3-storage-governança/img/25.png) | Criação de Dicionário de Ameaças (File Groups): Criamos o grupo customizado [SecOps] Bloqueio de Executáveis e Ransomware. Foram incluídas extensões críticas como .exe (bloqueio de Shadow IT), .bat, .ps1 (scripts maliciosos) e assinaturas de ransomware como .crypt, .locky e .wannacry. |
+| [![Storage 26](docs/fase3-storage-governança/img/26.png)](docs/fase3-storage-governança/img/26.png) | Template de Segurança Máxima: Unificamos o bloqueio de arquivos multimídia (para economizar storage) com o bloqueio de executáveis/ransomware em um único template de Triagem Ativa (Active Screening). |
 | [![Storage 27](docs/fase3-storage-governança/img/27.png)](docs/fase3-storage-governança/img/27.png) | Auditoria de tentativas configurada no Event Log |
 | [![Storage 28](docs/fase3-storage-governança/img/28.png)](docs/fase3-storage-governança/img/28.png) | Template de triagem com Active Screening |
 | [![Storage 29](docs/fase3-storage-governança/img/29.png)](docs/fase3-storage-governança/img/29.png) | Política aplicada na raiz `E:\Arquivos` — herança em cascata |
