@@ -8,7 +8,7 @@
 
 <p align="center">
   <a href="#️-stack-do-lab">Stack</a> •
-  <a href="#-topologia-da-infraestrutura">Topologia</a> •
+  <a href="#️-topologia-da-infraestrutura">Topologia</a> •
   <a href="#-índice">Índice</a> •
   <a href="#-fase-1-fundação-topologia-e-automação">Fase 1</a> •
   <a href="#-fase-2-segurança-hardening-e-governança-gpo">Fase 2</a> •
@@ -65,8 +65,8 @@
 
 | Site | Sub-rede | Servidores |
 |------|----------|-----------|
-| Matriz-Caxambu | `10.10.10.0/24` | `CXB-DC01`, `CXB-FS01`, `WIN10`,`CXB-DC02` |
-| BeloHorizonte | `172.16.1.0/24` |  |
+| Matriz-Caxambu | `10.10.10.0/24` | `CXB-DC01`, `CXB-FS01`, `WIN10` |
+| BeloHorizonte | `172.16.1.0/24` | `CXB-DC02` |
 
 ---
 
@@ -89,9 +89,9 @@
 | 🔐 Fase 2 | [Auditoria Avançada de Eventos](#13-auditoria-avançada-de-eventos) | ⚠️ Em documentação |
 | 🔐 Fase 2 | [GPO — Account Lockout e Política de Senhas](#14-gpo--account-lockout-e-política-de-senhas) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Servidor de Arquivos e Permissões NTFS](#15-servidor-de-arquivos-e-permissões-ntfs) | ✅ Concluído |
-| 📂 Fase 3 | [CXB-FS01 — Storage Spaces (Arquitetura Base)](#️-cxb-fs01--storage-spaces-arquitetura-base-do-servidor-de-arquivos) | ✅ Concluído |
-| 📂 Fase 3 | [Estrutura de Dados: Dedup e DFS-N](docs/fase3-storage-governança/fase3-storage-governança.md) | ⚠️ Em documentação |
-| 📂 Fase 3 | [Governança: FSRM, NTFS e ABE](docs/fase3-storage-governança/fase3-storage-governança.md) | ⚠️ Em documentação |
+| 📂 Fase 3 | [CXB-FS01 — Storage Spaces (Arquitetura Base)](#️-cxb-fs01--storage-spaces-arquitetura-base) | ✅ Concluído |
+| 📂 Fase 3 | [Dedup e DFS Namespaces](#-dedup-e-dfs-namespaces) | ✅ Concluído |
+| 📂 Fase 3 | [Governança: FSRM, NTFS e ABE](#-governança-fsrm-ntfs-e-abe) | ✅ Concluído |
 | 📂 Fase 3 | [Mapeamento Automático de Unidades via GPO](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Print Server e Automação (GPO)](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Conectividade Matriz/Filial (DFS-R, VPN & BranchCache)](docs/fase3-conectividade-filial/fase3-conectividade-filial.md) | ⚠️ Em documentação |
@@ -132,7 +132,7 @@ robson.local
 
 ### 2. Automação de Usuários via PowerShell
 
-Provisionar usuário por usuário no ADUC não escala. O script lê um CSV simulando uma exportação do RH e provisiona as contas automaticamente nas OUs corretas, com tratamento de erro e senhas seguras.
+Provisionar usuário por usuário no ADUC não escala. O script lê um CSV simulando uma exportação do RH e cria as contas automaticamente nas OUs corretas, com tratamento de erro e senhas seguras.
 
 **[→ Script e CSV disponíveis em `/Scripts`](Scripts)**
 
@@ -180,11 +180,10 @@ Um único DC é ponto único de falha total: se cair, nenhum usuário autentica,
 
 ### 4. Design Multi-Site e Replicação
 
-Sem Sites configurados, o AD replica de forma indiscriminada — qualquer autenticação pode resolver para o DC mais distante geograficamente, gerando latência e congestionamento em links WAN. A configuração de Sites instrui o KCC (Knowledge Consistency Checker) a otimizar a topologia de replicação automaticamente.
+Sem Sites configurados, o AD replica de forma indiscriminada. A configuração de Sites instrui o KCC (Knowledge Consistency Checker) a otimizar a topologia de replicação automaticamente, garantindo que cada usuário autentique no DC geograficamente mais próximo.
 
 - **Site Matriz-Caxambu:** sub-rede `10.10.10.0/24` — `CXB-DC01` e `CXB-FS01`
 - **Site BeloHorizonte (BH):** sub-rede `172.16.1.0/24` — `CXB-DC02`
-- **Objetivo:** autenticação sempre pelo DC geograficamente mais próximo do usuário
 
 | Evidência | Descrição |
 |-----------|-----------|
@@ -201,73 +200,54 @@ Sem Sites configurados, o AD replica de forma indiscriminada — qualquer autent
 
 ### 5. Gestão de Roles FSMO
 
-O AD possui 5 roles FSMO que controlam operações que exigem autoridade única no domínio. Com dois DCs, é possível distribuir essas responsabilidades para evitar que um único servidor seja ponto crítico operacional.
-
-A role **RID Master** foi transferida para `CXB-DC02`. Dessa forma, a criação de novos objetos (usuários, grupos, computadores) não depende exclusivamente do DC principal.
+Com dois DCs, é possível distribuir as 5 roles FSMO para evitar que um único servidor seja ponto crítico operacional. A role **RID Master** foi transferida para `CXB-DC02`, de modo que a criação de novos objetos no AD não dependa exclusivamente do DC principal.
 
 | Evidência | Descrição |
 |-----------|-----------|
-| [![TFSMO1](img/TFSMO1.png)](img/TFSMO1.png) | Abrindo o wizard de Transferência dos Operation Masters |
-| [![TFSMO2](img/TFSMO2.png)](img/TFSMO2.png) | Confirmando a transferência do RID Master para `CXB-DC02` |
+| [![TFSMO1](img/TFSMO1.png)](img/TFSMO1.png) | Wizard de Transferência dos Operation Masters |
+| [![TFSMO2](img/TFSMO2.png)](img/TFSMO2.png) | Transferência do RID Master confirmada para `CXB-DC02` |
 | [![TFSMO3](img/TFSMO3.png)](img/TFSMO3.png) | Validação via `netdom query fsmo` no CMD |
 
 ---
 
 ### 6. [Troubleshooting: Renomeando DCs (Zero Downtime) e Fix de NTP](docs/troubleshooting_rename_dc.md)
 
-Documentação completa do processo de renomeação dos DCs sem interrupção de serviço. Cobre todas as etapas e problemas encontrados:
+Documentação completa do processo de renomeação dos DCs sem interrupção de serviço.
 
-**Cenário:** padronização da nomenclatura para arquitetura multi-site.
-
-| Antes | Depois |
-|-------|--------|
-| `SRV-DC01` | `CXB-DC01` |
-| `MBR1` | `CXB-DC02` |
-
-**Processo de renomeação via `netdom` (sem rebaixamento do DC):**
+**Renomeação via `netdom`** (sem rebaixamento do DC):
 
 ```powershell
-# Etapa 1 — Adiciona o novo nome como apontamento alternativo no AD e DNS
-netdom computername <servidor> /add:<novo-nome>.robson.local
-
-# Etapa 2 — Promove o novo nome a principal (requer reboot)
-netdom computername <servidor> /makeprimary:<novo-nome>.robson.local
-
-# Etapa 3 — Remove o nome antigo após o reinício
-netdom computername <servidor> /remove:<nome-antigo>.robson.local
+netdom computername <servidor> /add:<novo-nome>.robson.local    # adiciona nome alternativo
+netdom computername <servidor> /makeprimary:<novo-nome>.robson.local  # promove (reboot)
+netdom computername <servidor> /remove:<nome-antigo>.robson.local     # remove nome antigo
 ```
 
-**Sincronização e limpeza pós-renomeação:**
+**Sincronização e limpeza DNS:**
 
 ```powershell
-# Força replicação em todas as partições e sites
-repadmin /syncall /A /e
+repadmin /syncall /A /e  # propaga alteração por todas as partições e sites
 ```
 
-Após a replicação, os registros DNS antigos (`srv-dc01`, `MBR1`) foram removidos manualmente — registros obsoletos causam falhas de autenticação Kerberos por DNS Round Robin.
+Registros DNS antigos (`srv-dc01`, `MBR1`) removidos manualmente — registros obsoletos causam falhas Kerberos por DNS Round Robin.
 
-**Fix de NTP (problema encontrado em produção):**
-
-`dcdiag` apontou erro 1355 no PDC Emulator após renomeação — o serviço de tempo perdeu referência e parou de distribuir hora para o domínio. Diferenças de tempo superiores a 5 minutos quebram toda a autenticação Kerberos.
+**Fix de NTP após renomeação do PDC Emulator** (erro 1355 no `dcdiag`):
 
 ```powershell
-# Aponta para NTP.br e define como fonte confiável
 w32tm /config /manualpeerlist:"a.ntp.br b.ntp.br c.ntp.br,0x8" /syncfromflags:manual /reliable:yes /update
-
 net stop w32time && net start w32time
-
-# Força ressincronização imediata
 w32tm /resync
 ```
+
+> Diferenças de tempo acima de 5 minutos quebram a autenticação Kerberos em todo o domínio. Sempre reconfigurar NTP após qualquer renomeação ou migração do PDC Emulator.
 
 | Evidência | Descrição |
 |-----------|-----------|
 | [![Mudança1](docs/img/Mudança1.png)](docs/img/Mudança1.png) | Execução do `/add` inserindo `CXB-DC01` no AD |
-| [![Mudança2](docs/img/Mudança2.png)](docs/img/Mudança2.png) | Execução do `/makeprimary` — alerta de reboot obrigatório |
-| [![Mudança3](docs/img/Mudança3.png)](docs/img/Mudança3.png) | Remoção do nome fantasma `SRV-DC01` com `/remove` |
+| [![Mudança2](docs/img/Mudança2.png)](docs/img/Mudança2.png) | Execução do `/makeprimary` — aviso de reboot obrigatório |
+| [![Mudança3](docs/img/Mudança3.png)](docs/img/Mudança3.png) | Remoção do nome `SRV-DC01` com `/remove` |
 | [![Mudança4](docs/img/Mudança4.png)](docs/img/Mudança4.png) | Mesmo processo no DC secundário removendo `MBR1` |
 | [![Mudança5](docs/img/Mudança5.png)](docs/img/Mudança5.png) | `repadmin /syncall` — sincronização concluída sem erros |
-| [![Mudança6](docs/img/Mudança6.png)](docs/img/Mudança6.png) | Limpeza no DNS Manager — registros A obsoletos removidos |
+| [![Mudança6](docs/img/Mudança6.png)](docs/img/Mudança6.png) | DNS Manager — registros A obsoletos removidos |
 | [![Mudança7](docs/img/Mudança7.png)](docs/img/Mudança7.png) | `dcdiag` com erro 1355 no Time Server antes do fix |
 | [![Mudança8](docs/img/Mudança8.png)](docs/img/Mudança8.png) | `dcdiag` limpo após reconfiguração do NTP |
 
@@ -279,18 +259,11 @@ w32tm /resync
 
 ### 7. Grupos de Segurança — Metodologia AGDLP
 
-Adicionar usuários diretamente nas ACLs de pastas é um antipadrão — cada desligamento vira uma auditoria manual por permissões avulsas espalhadas pelo servidor. A metodologia **AGDLP** resolve isso:
+Em vez de atribuir permissões diretamente a usuários individuais nas ACLs das pastas, toda a estrutura foi construída sobre Grupos Globais. O resultado prático: quando alguém sai da empresa, a conta é removida do grupo e o acesso some de todos os recursos de uma vez — sem auditoria manual por permissões espalhadas.
 
 > **A**ccount → **G**lobal Group → **D**omain **L**ocal Group → **P**ermission
 
-- Usuários entram em Grupos Globais por função
-- Grupos Globais entram em Grupos de Domínio Local por recurso
-- Grupos de Domínio Local recebem permissão na pasta
-- Resultado: desligamento = remover da Global Group. Nada mais.
-
-**Implementado:**
 - Grupo `G_TI_AcessoFull` (escopo Global) criado para a equipe de TI
-- Usuários vinculados ao grupo, não diretamente às pastas
 
 | Evidência | Descrição |
 |-----------|-----------|
@@ -301,11 +274,9 @@ Adicionar usuários diretamente nas ACLs de pastas é um antipadrão — cada de
 
 ### 8. GPO — Bloqueio de Painel de Controle
 
-Usuário final com acesso ao Painel de Controle = chamado aberto por desconfiguração. Essa GPO elimina essa categoria inteira de incidentes.
-
 - **Política:** Bloqueio de Painel de Controle e Configurações do Sistema
 - **Escopo:** OU `TI` — homologação antes de expandir para toda a organização
-- **Validação:** `gpupdate /force` na estação cliente confirmou a aplicação
+- **Validação:** `gpupdate /force` confirmou a aplicação na estação
 
 | Evidência | Descrição |
 |-----------|-----------|
@@ -318,53 +289,42 @@ Usuário final com acesso ao Painel de Controle = chamado aberto por desconfigur
 
 ### 9. GPO — Bloqueio de USB (DLP)
 
-Pen drive é vetor duplo de risco: entrada de malware e saída de dados sensíveis. Essa política age no nível de máquina — não importa quem fizer logon.
+Pen drive é vetor duplo de risco: entrada de malware e saída de dados. Essa política age no nível de máquina — qualquer usuário que fizer logon está sujeito ao bloqueio.
 
 - **Política:** *All Removable Storage classes: Deny all access*
 - **Escopo:** OU `COMPUTADORES` (política de máquina, não de usuário)
-- Objeto de computador da estação movido do container padrão para a OU
 
 | Evidência | Descrição |
 |-----------|-----------|
 | [![USB1](img/USB1.png)](img/USB1.png) | Máquina movida para a OU `COMPUTADORES` |
-| [![USB2](img/USB2.png)](img/USB2.png) | Política configurada e ativa no servidor |
+| [![USB2](img/USB2.png)](img/USB2.png) | Política configurada e ativa |
 | [![USB3](img/USB3.png)](img/USB3.png) | Acesso à unidade removível bloqueado na estação |
 
 ---
 
 ### 10. Hardening — Protected Users
 
-**Protected Users** é um grupo nativo do AD que aplica proteções adicionais de autenticação às contas membro. Para contas administrativas, é uma das medidas de hardening mais impactantes disponíveis nativamente no Windows Server.
-
-**O que foi implementado:**
-- Usuário `Admin-Caxambu` criado na OU `Matriz-Caxambu\ADM`
-- Vinculado ao grupo de segurança `GG-Admins-Caxambu`
-- Adicionado ao grupo `Protected Users`
-
-**Proteções aplicadas automaticamente:**
+**Protected Users** é um grupo nativo do AD que força proteções adicionais nas contas membro, sem custo adicional de licença ou software.
 
 | Proteção | Efeito |
 |----------|--------|
-| ❌ Sem cache NTLM | Elimina ataques Pass-the-Hash |
-| ❌ Sem autenticação NTLM / CredSSP / WDigest | Força uso exclusivo de Kerberos |
-| ❌ Ticket Kerberos máximo de 4h | Reduz janela de exploração de tickets roubados |
-| ❌ Sem delegação Kerberos irrestrita | Bloqueia Unconstrained Delegation attacks |
+| Sem cache de credenciais NTLM | Elimina ataques Pass-the-Hash |
+| Sem autenticação NTLM / CredSSP / WDigest | Força uso exclusivo de Kerberos |
+| Ticket Kerberos com TTL máximo de 4h | Reduz janela de exploração de tickets roubados |
+| Sem delegação Kerberos irrestrita | Bloqueia Unconstrained Delegation attacks |
+
+- Usuário `Admin-Caxambu` criado em `Matriz-Caxambu\ADM`, vinculado ao grupo `GG-Admins-Caxambu` e adicionado ao `Protected Users`
 
 | Evidência | Descrição |
 |-----------|-----------|
-| [![P1](img/P1.png)](img/P1.png) | Usuário `Admin-Caxambu` e grupo `GG-Admins-Caxambu` criados |
+| [![P1](img/P1.png)](img/P1.png) | Usuário e grupo criados na OU ADM |
 | [![P2](img/P2.png)](img/P2.png) | Conta adicionada ao grupo `Protected Users` |
 
 ---
 
 ### 11. Delegação de Privilégios (RBAC) e Segregação de Funções
 
-Em vez de distribuir Domain Admin para a equipe de TI local, delegamos permissões específicas sobre as OUs correspondentes. Menor superfície de ataque, maior rastreabilidade.
-
-**Modelo RBAC aplicado:**
-- Grupo `GG-Admins-Caxambu` recebe delegação na OU `Matriz-Caxambu`
-- Permissões concedidas: redefinir senhas, desbloquear contas, criar/excluir usuários na OU
-- O grupo **não tem** acesso fora da OU delegada — princípio do menor privilégio (PoLP)
+Em vez de distribuir Domain Admin, delegamos permissões específicas sobre as OUs correspondentes — reset de senha, desbloqueio de conta, criação e exclusão de usuários dentro da OU. A equipe de TI local administra sua área sem visibilidade nem acesso ao restante do domínio.
 
 | Evidência | Descrição |
 |-----------|-----------|
@@ -378,7 +338,7 @@ Em vez de distribuir Domain Admin para a equipe de TI local, delegamos permissõ
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
-A política **"Deny Logon as a Service"** aplicada a contas administrativas impede que um atacante que comprometa a conta registre um serviço malicioso para manter persistência — técnica comum em ataques pós-exploração (T1543 no MITRE ATT&CK).
+Impede que uma conta administrativa comprometida seja usada para registrar um serviço malicioso e manter persistência (MITRE ATT&CK T1543).
 
 ---
 
@@ -386,7 +346,7 @@ A política **"Deny Logon as a Service"** aplicada a contas administrativas impe
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
-Sem auditoria ativa, qualquer alteração no diretório passa despercebida. Logs avançados ativados para gestão de contas: criação, exclusão, alteração de senha, bloqueio e desbloqueio ficam registrados com usuário executor, horário e estação de origem. Base para qualquer processo de resposta a incidentes.
+Logs avançados para gestão de contas: criação, exclusão, alteração de senha, bloqueio e desbloqueio registrados com usuário executor, horário e estação de origem.
 
 ---
 
@@ -394,22 +354,23 @@ Sem auditoria ativa, qualquer alteração no diretório passa despercebida. Logs
 
 > ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
 
-Bloqueio automático após N tentativas inválidas e exigência de complexidade mínima de senha. Duas configurações que eliminam a maior parte dos ataques de força bruta contra o AD com custo zero de implementação.
+Bloqueio automático após tentativas inválidas e exigência de complexidade mínima de senha.
 
 ---
 
 ## 📂 Fase 3: Serviços de Arquivos, Storage Avançado e Governança
 
+> **[→ Documentação técnica completa em `docs/fase3-storage-governança/`](docs/fase3-storage-governança/fase3-storage-governança.md)**
+
 ---
 
 ### 15. Servidor de Arquivos e Permissões NTFS
 
-O modelo das "duas portas": o compartilhamento SMB é aberto para o grupo de TI, e o controle granular acontece inteiramente na camada NTFS. O usuário nunca tem mais acesso do que precisa.
+O modelo das "duas portas": o Share SMB é a porta externa — aberta para quem já está na rede. O NTFS é a porta interna — onde o acesso é realmente controlado, por grupo, por pasta, com granularidade total.
 
-**Implementado:**
 - Pasta `TI_Confidencial` em `C:\Arquivo_Matriz\`
-- Herança de permissões desabilitada por pasta
-- Permissão `Modify` para o grupo `G_TI_AcessoFull`
+- Herança desabilitada por pasta — cada diretório departamental tem sua própria ACL
+- Permissão `Modify` para `G_TI_AcessoFull`
 
 > **Por que `Modify` e não `Full Control`?** Com `Modify`, o usuário lê, escreve e deleta — mas não altera ACLs nem toma posse do objeto. O controle das permissões permanece exclusivo do administrador.
 
@@ -420,15 +381,13 @@ O modelo das "duas portas": o compartilhamento SMB é aberto para o grupo de TI,
 | [![NTFS3](img/NTFS3.png)](img/NTFS3.png) | Permissão `Modify` configurada |
 | [![NTFS4](img/NTFS4.png)](img/NTFS4.png) | Herança desabilitada, usuários individuais removidos |
 | [![NTFS5](img/NTFS5.png)](img/NTFS5.png) | Unidade de rede mapeada e acessível no WIN10 |
-| [![NTFS6](img/NTFS6.png)](img/NTFS6.png) | Validação de acesso por grupo — acesso permitido e registrado |
+| [![NTFS6](img/NTFS6.png)](img/NTFS6.png) | Validação de acesso por grupo |
 
 ---
 
-### 🖥️ CXB-FS01 — Storage Spaces: Arquitetura Base do Servidor de Arquivos
+### 🖥️ CXB-FS01 — Storage Spaces: Arquitetura Base
 
-> **[→ Documentação técnica completa em `docs/fase3-storage-governança/`](docs/fase3-storage-governança/fase3-storage-governança.md)**
-
-O `CXB-FS01` é a VM dedicada para todos os serviços de arquivo. Em vez de uma partição simples, foi construído sobre **Storage Spaces** — a camada de abstração de armazenamento do Windows Server — permitindo expansão futura de capacidade sem downtime e provisionamento inteligente de espaço.
+O `CXB-FS01` é uma VM dedicada — os DCs não acumulam role de File Server. Toda a camada de armazenamento foi construída sobre **Storage Spaces**, permitindo expansão de capacidade sem downtime e gerenciamento de múltiplos discos como um único recurso lógico.
 
 #### Topologia do Lab — 4 Nós
 
@@ -438,35 +397,29 @@ O `CXB-FS01` é a VM dedicada para todos os serviços de arquivo. Em vez de uma 
 
 #### Provisionamento Físico — 3 Discos VHDX de 20GB
 
-Foram adicionados 3 discos virtuais VHDX à controladora SCSI do `CXB-FS01`. Expansão dinâmica no host para otimização de recursos.
-
 | Evidência | Descrição |
 |-----------|-----------|
-| [![Storage 2](docs/fase3-storage-governança/img/2.png)](docs/fase3-storage-governança/img/2.png) | 3 discos RAW de 20GB adicionados ao servidor |
+| [![Storage 2](docs/fase3-storage-governança/img/2.png)](docs/fase3-storage-governança/img/2.png) | 3 discos RAW de 20GB adicionados à controladora SCSI |
 
 #### Storage Pool — `POOL-DADOS-CXB`
 
-Os 3 discos RAW foram unificados em um único Pool Lógico `POOL-DADOS-CXB`. Isso abstrai o hardware físico — o administrador gerencia um recurso único de 60GB. Expansão futura = adicionar disco ao pool, sem reformatar.
+Os 3 discos RAW foram unificados em um único Pool Lógico. O administrador passa a gerenciar 60GB como um recurso único — adicionar capacidade futura significa adicionar um disco ao pool, sem reformatar nem migrar dados.
 
 | Evidência | Descrição |
 |-----------|-----------|
 | [![Storage 3](docs/fase3-storage-governança/img/3.png)](docs/fase3-storage-governança/img/3.png) | Criação do `POOL-DADOS-CXB` unificando os 3 discos |
 
-#### Storage Tiering — Conceito Documentado
+#### Storage Tiering — Conceito
 
-A opção Storage Tiers aparece desabilitada no lab (todos os discos são do mesmo tipo virtual).
-
-> **Em produção:** o Tiering mescla SSDs (camada rápida) e HDDs (camada de capacidade). O Windows move automaticamente *Hot Data* para SSDs e *Cold Data* para HDDs — otimizando custo e performance sem intervenção manual.
+Storage Tiers está indisponível no lab porque todos os discos são do mesmo tipo. Em produção, o Tiering mescla SSDs e HDDs — o Windows move automaticamente os dados mais acessados para a camada rápida sem intervenção manual.
 
 | Evidência | Descrição |
 |-----------|-----------|
-| [![Storage 4](docs/fase3-storage-governança/img/4.png)](docs/fase3-storage-governança/img/4.png) | Storage Tiers indisponível com discos homogêneos |
+| [![Storage 4](docs/fase3-storage-governança/img/4.png)](docs/fase3-storage-governança/img/4.png) | Storage Tiers indisponível com discos homogêneos — conceito documentado |
 
 #### Layout — Simple (Striping)
 
-Foi escolhido o layout **Simple (Striping)** em vez de Mirror.
-
-> **Justificativa:** discos virtuais residem no mesmo SSD físico do host — Mirror geraria overhead sem ganho real de redundância. Simple soma os 60GB e maximiza throughput de I/O. **Em produção com hardware real, a escolha seria Mirror ou Parity.**
+Mirror foi descartado porque os discos virtuais residem no mesmo SSD físico do host — espelhar geraria overhead de escrita sem ganho real de redundância. Simple soma os 60GB e maximiza o throughput de I/O. Em hardware físico real, a escolha seria Mirror ou Parity.
 
 | Evidência | Descrição |
 |-----------|-----------|
@@ -474,23 +427,17 @@ Foi escolhido o layout **Simple (Striping)** em vez de Mirror.
 
 #### Thin Provisioning e Overprovisioning
 
-**Thin (Dinâmico):** espaço alocado no disco físico somente conforme os dados são gravados. Permite configurar o disco virtual maior que o pool físico atual.
+Thin (Dinâmico): o espaço no disco físico só é alocado conforme os dados são gravados. Isso permite apresentar ao sistema operacional um disco maior que o pool físico atual — técnica chamada de overprovisioning, usada por AWS e Azure para diferir a compra de hardware até que o uso real exija.
 
-> **Overprovisioning:** amplamente usado por AWS, Azure e outros. Apresenta um disco grande ao SO, adiando a compra de hardware adicional até que o uso real se aproxime do limite físico.
->
-> **Write-back Cache:** espaço reservado para absorver picos de gravação usando a camada mais rápida, evitando lentidão percebida pelo usuário.
+Write-back Cache: reserva uma fatia da camada mais rápida para absorver picos de gravação, evitando que rajadas de I/O travem a experiência do usuário.
 
 | Evidência | Descrição |
 |-----------|-----------|
-| [![Storage 6](docs/fase3-storage-governança/img/6.png)](docs/fase3-storage-governança/img/6.png) | Thin provisioning e Overprovisioning configurados |
+| [![Storage 6](docs/fase3-storage-governança/img/6.png)](docs/fase3-storage-governança/img/6.png) | Thin provisioning e overprovisioning configurados |
 
 #### SMB Multichannel — Validação
 
-`Get-SmbServerConfiguration` confirmou o SMB Multichannel ativo nativamente no `CXB-FS01`.
-
-> **Benefícios:**
-> - **Agregação de Banda:** 2 NICs de 1Gbps = 2Gbps efetivos de throughput
-> - **Tolerância a Falhas de Rede:** cabo rompido → transferência continua pela outra NIC sem interrupção para o usuário
+`Get-SmbServerConfiguration` confirmou o recurso ativo nativamente. Com múltiplas NICs, o Multichannel soma a largura de banda disponível e mantém transferências em andamento mesmo se uma interface de rede cair.
 
 | Evidência | Descrição |
 |-----------|-----------|
@@ -498,37 +445,120 @@ Foi escolhido o layout **Simple (Striping)** em vez de Mirror.
 
 #### Volume Final — `E: Dados-CXB` em NTFS
 
+NTFS é pré-requisito para as roles de governança das próximas fases. ReFS não suporta FSRM; FAT32 não suporta ACLs granulares nem Data Deduplication.
+
 | Evidência | Descrição |
 |-----------|-----------|
 | [![Storage 8](docs/fase3-storage-governança/img/8.png)](docs/fase3-storage-governança/img/8.png) | Volume `E: Dados-CXB` montado e formatado em NTFS |
-| [![Storage 9](docs/fase3-storage-governança/img/9.png)](docs/fase3-storage-governança/img/9.png) | Validação final no Server Manager |
-
-> **Por NTFS e não ReFS?** NTFS é pré-requisito obrigatório para as roles de governança. ReFS não suporta FSRM; FAT32 não suporta ACLs granulares nem Data Deduplication.
+| [![Storage 9](docs/fase3-storage-governança/img/9.png)](docs/fase3-storage-governança/img/9.png) | Validação final do Pool e volume no Server Manager |
 
 ---
 
-### Estrutura de Dados e Otimização — Data Dedup e DFS-N
+### 📦 Dedup e DFS Namespaces
 
-> ⚠️ **Em documentação — [ver `docs/fase3-storage-governança/`](docs/fase3-storage-governança/fase3-storage-governança.md)**
+#### Instalação das Roles
 
-**Data Deduplication:** elimina blocos duplicados no volume NTFS, reduzindo consumo de espaço por arquivos similares. Em ambientes corporativos pode reduzir o uso de storage em 30–70%.
+A stack de File Services foi instalada em bloco: **Data Deduplication**, **DFS Namespaces**, **DFS Replication** (preparando para a futura filial BH) e **FSRM**. Instalar o DFS-R já nesta etapa evita reinstalação com dependências em produção.
 
-**DFS Namespaces (DFS-N):** cria um caminho UNC único (`\\robson.local\dados`) que abstrai o servidor real por baixo. Migrações de servidor ficam transparentes para o usuário.
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 10](docs/fase3-storage-governança/img/10.png)](docs/fase3-storage-governança/img/10.png) | Seleção das roles no Server Manager |
+
+#### Data Deduplication — Agendamento Inteligente
+
+A deduplicação foi habilitada exclusivamente no volume `E:`. Isolar do `C:` garante que o processo de otimização — que consome CPU para varredura de blocos — não compete com o kernel do SO.
+
+- **Background Optimization:** processamento contínuo em baixa prioridade durante o horário comercial
+- **Throughput Optimization:** janela pesada às 02:00h com 6 horas de duração
+
+O agendamento na madrugada não é só questão de performance: é quando a rede está ociosa e o processo pode ler e reescrever blocos sem impactar transferências de usuários.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 11](docs/fase3-storage-governança/img/11.png)](docs/fase3-storage-governança/img/11.png) | Volume `E:` selecionado como alvo da deduplicação |
+| [![Storage 12](docs/fase3-storage-governança/img/12.png)](docs/fase3-storage-governança/img/12.png) | Agendamento configurado: janela noturna às 02:00h / 6h |
+
+#### DFS Namespaces — Abstração do Servidor
+
+O DFS cria um caminho UNC único (`\\robson.local\Arquivos`) que funciona independente de qual servidor está por baixo. Migrar o File Server no futuro ou adicionar um servidor na filial não exige que os usuários remapeiem unidades de rede.
+
+**Decisão arquitetural importante — caminho raiz do Namespace:**
+
+O wizard sugere `C:\DFSRoots` como caminho padrão. Esse caminho foi alterado manualmente para `E:\Arquivos`. O motivo é direto: manter no `C:` ignoraria completamente o Storage Pool e a deduplicação configurada na fase anterior. Ao apontar para o `E:`, todo o tráfego de dados passa pelo volume otimizado.
+
+**Permissões de Share:**
+
+As permissões do Share foram definidas como `Administrators: Full Control` e `Users: Change`. A permissão efetiva de qualquer usuário é sempre o resultado mais restritivo entre Share e NTFS — então o NTFS continua sendo o gargalo real para controle de acesso. O que essa configuração adiciona é um teto explícito no Share: mesmo que o NTFS de alguma pasta fosse mal configurado com permissão elevada por engano, usuários comuns nunca passariam do nível `Change` pela rede. É uma camada de defesa em profundidade válida.
+
+**Namespace baseado em domínio:**
+
+`\\robson.local\Arquivos` em vez de `\\CXB-FS01\Arquivos`. Com o namespace de domínio, o endereço é resolvido pelo AD — se o servidor físico mudar, só o target do DFS precisa ser atualizado, e todos os usuários continuam no mesmo caminho sem saber que houve migração.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 13](docs/fase3-storage-governança/img/13.png)](docs/fase3-storage-governança/img/13.png) | Configuração do DFS Namespace |
+| [![Storage 15](docs/fase3-storage-governança/img/15.png)](docs/fase3-storage-governança/img/15.png) | Caminho alterado para `E:\Arquivos` (saindo do padrão `C:\`) |
+| [![Storage 16](docs/fase3-storage-governança/img/16.png)](docs/fase3-storage-governança/img/16.png) | Namespace baseado em domínio selecionado |
+| [![Storage 18](docs/fase3-storage-governança/img/18.png)](docs/fase3-storage-governança/img/18.png) | Namespace `\\robson.local\Arquivos` ativo |
 
 ---
 
-### Governança e Segurança — FSRM, NTFS e ABE
+### 🔒 Governança: FSRM, NTFS e ABE
 
-> ⚠️ **Em documentação — [ver `docs/fase3-storage-governança/`](docs/fase3-storage-governança/fase3-storage-governança.md)**
+#### Estrutura Departamental — Pastas e Herança NTFS
 
-**FSRM (File Server Resource Manager):**
-- Quotas por usuário/pasta — impede um departamento de monopolizar o storage
-- File Screening — bloqueia extensões proibidas (`.mp3`, `.avi`, `.exe`) de serem salvas no servidor
-- Relatórios de uso agendados com envio automático por e-mail
+A estrutura física em `E:\Arquivos` foi criada espelhando as OUs do AD: `ADM`, `TI` e `Publico`. Cada pasta representa um escopo de acesso distinto.
 
-**ABE (Access-Based Enumeration):**
-- Usuários enxergam somente as pastas às quais têm acesso NTFS
-- Pastas de outros departamentos ficam invisíveis — reduz vetores de reconhecimento interno e evita curiosidade sobre recursos não autorizados
+A herança foi quebrada na raiz do compartilhamento. Isso significa que nenhuma permissão genérica desce automaticamente para as subpastas — cada diretório departamental começa com a ACL zerada e recebe apenas as entradas necessárias. O resultado prático é que o acesso é **negado por padrão** (Implicit Deny): se o grupo de um usuário não está na ACL daquela pasta, ele não chega lá.
+
+Após quebrar a herança, os grupos genéricos `Users` e `Authenticated Users` foram removidos das ACLs. Somente `SYSTEM` e `Administrators` foram mantidos — ambos necessários para que rotinas de backup e manutenção do servidor continuem funcionando sem interrupção.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 19](docs/fase3-storage-governança/img/19.png)](docs/fase3-storage-governança/img/19.png) | Pastas `ADM`, `TI` e `Publico` criadas em `E:\Arquivos` |
+| [![Storage 20](docs/fase3-storage-governança/img/20.png)](docs/fase3-storage-governança/img/20.png) | Herança quebrada — ACL zerada, Implicit Deny ativo |
+| [![Storage 21](docs/fase3-storage-governança/img/21.png)](docs/fase3-storage-governança/img/21.png) | ACL após remoção dos grupos genéricos — apenas `SYSTEM` e `Administrators` |
+| [![Storage 22](docs/fase3-storage-governança/img/22.png)](docs/fase3-storage-governança/img/22.png) | Permissão `Modify` atribuída ao grupo `GG-Admins-Caxambu` na pasta `ADM` |
+
+#### Access-Based Enumeration (ABE)
+
+O ABE foi habilitado nas propriedades do Namespace DFS. Com ele ativo, o usuário só enxerga no Explorer as pastas às quais tem acesso NTFS — pastas de outros departamentos ficam invisíveis, não apenas inacessíveis. Isso elimina a tentação de tentar acessar o que não é seu e reduz chamados de suporte por mensagens de "Acesso Negado" em pastas que o usuário nunca deveria ver.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage ABE](docs/fase3-storage-governança/img/23-ABE.png)](docs/fase3-storage-governança/img/23-ABE.png) | ABE habilitado nas propriedades do Namespace DFS |
+
+#### Cotas de Disco (FSRM Quotas)
+
+Hard Quotas de 10GB foram aplicadas na pasta `ADM`. Hard Quota impede que o usuário grave além do limite — diferente da Soft Quota, que apenas avisa.
+
+As cotas foram criadas a partir de um **template**, não configuradas diretamente na pasta. Isso significa que ajustar o limite para 20GB no futuro requer alterar apenas o template — todas as pastas vinculadas herdam a mudança automaticamente, sem precisar editar pasta por pasta.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 24](docs/fase3-storage-governança/img/24.png)](docs/fase3-storage-governança/img/24.png) | Hard Quota de 10GB aplicada na pasta `ADM` via template |
+| [![Storage 25](docs/fase3-storage-governança/img/25.png)](docs/fase3-storage-governança/img/25.png) | Template de quota configurado |
+
+#### Triagem de Arquivos — File Screening
+
+O FSRM foi configurado para bloquear extensões indesejadas antes que o arquivo seja gravado no servidor. A política combina dois objetivos distintos numa única regra:
+
+**Controle de storage** — bloqueia arquivos de mídia (`.mp3`, `.avi`, `.mkv`) que consomem espaço sem valor corporativo.
+
+**Controle de segurança** — bloqueia executáveis e scripts (`.exe`, `.bat`) que não têm razão legítima de estar num compartilhamento departamental, além de extensões associadas a ransomware (`.crypt`, `.locky`, `.wannacry`).
+
+A política de triagem foi definida como **Active Screening** — bloqueio real, não apenas auditoria. Toda tentativa de violação gera um evento no Windows Event Log, que pode ser consumido por ferramentas de SIEM ou consultado diretamente pelo time de TI.
+
+A política foi aplicada na **raiz** de `E:\Arquivos`, não pasta por pasta. Isso garante que qualquer subpasta criada no futuro herde a proteção automaticamente.
+
+> **Nota operacional:** o bloqueio de `.ps1` (PowerShell scripts) faz sentido para usuários finais, mas pode afetar a equipe de TI se ela precisar armazenar scripts no servidor. Considere criar uma exceção na pasta `TI` para o grupo `GG-Admins-Caxambu`, ou manter um diretório de scripts fora do escopo da política.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 26](docs/fase3-storage-governança/img/26.png)](docs/fase3-storage-governança/img/26.png) | File Group com extensões de mídia e executáveis bloqueados |
+| [![Storage 27](docs/fase3-storage-governança/img/27.png)](docs/fase3-storage-governança/img/27.png) | Auditoria de tentativas configurada no Event Log |
+| [![Storage 28](docs/fase3-storage-governança/img/28.png)](docs/fase3-storage-governança/img/28.png) | Template de triagem com Active Screening |
+| [![Storage 29](docs/fase3-storage-governança/img/29.png)](docs/fase3-storage-governança/img/29.png) | Política aplicada na raiz `E:\Arquivos` — herança em cascata |
 
 ---
 
@@ -536,7 +566,7 @@ Foi escolhido o layout **Simple (Striping)** em vez de Mirror.
 
 > ⚠️ **Em documentação.**
 
-GPO com Drive Maps faz o mapeamento automaticamente no logon do usuário, com **Item-Level Targeting** por departamento: usuários de TI recebem `T:`, usuários de ADM recebem `A:`. Sem script local, sem intervenção manual, sem suporte.
+GPO com Drive Maps e Item-Level Targeting por departamento — usuários de TI recebem `T:`, usuários de ADM recebem `A:`. Sem script local, sem intervenção manual.
 
 ---
 
@@ -544,7 +574,7 @@ GPO com Drive Maps faz o mapeamento automaticamente no logon do usuário, com **
 
 > ⚠️ **Em documentação — [ver `docs/fase3-conectividade-filial/`](docs/fase3-conectividade-filial/fase3-conectividade-filial.md)**
 
-DFS-R para replicação de arquivos entre sites, VPN site-to-site e BranchCache para otimização de acesso a conteúdo do servidor centralizado via link WAN.
+DFS-R para replicação de arquivos entre sites, VPN site-to-site e BranchCache para otimização do acesso ao conteúdo via link WAN.
 
 ---
 
@@ -552,7 +582,7 @@ DFS-R para replicação de arquivos entre sites, VPN site-to-site e BranchCache 
 
 > ⚠️ **Em documentação — [ver `docs/fase3-disaster-recovery/`](docs/fase3-disaster-recovery/fase3-disaster-recovery.md)**
 
-Windows Admin Center (WAC) como painel centralizado, VSS para snapshots consistentes de dados em uso e estratégia de backup otimizado para o ambiente multi-DC e multi-site.
+Windows Admin Center (WAC) como painel centralizado, VSS para snapshots consistentes e estratégia de backup para o ambiente multi-DC.
 
 ---
 
@@ -563,15 +593,18 @@ Windows Admin Center (WAC) como painel centralizado, VSS para snapshots consiste
 - [x] Alta disponibilidade — DC Secundário (`CXB-DC02`)
 - [x] Design Multi-Site e controle de replicação
 - [x] Gestão e redistribuição de Roles FSMO
-- [x] Troubleshooting: renomeação de DCs + replicação + fix de NTP
+- [x] Troubleshooting: renomeação de DCs + replicação + fix NTP
 - [x] GPOs de hardening (Painel de Controle e USB/DLP)
 - [x] Servidor de Arquivos com permissões NTFS granulares
 - [x] Delegação de Privilégios (RBAC) e Segregação de Funções
 - [x] Hardening — Protected Users (eliminação de NTLM / Pass-the-Hash)
 - [x] `CXB-FS01` — Storage Spaces com Thin Provisioning e SMB Multichannel
-- [ ] Data Deduplication e DFS Namespaces (DFS-N)
-- [ ] FSRM — Quotas, File Screening e relatórios agendados
-- [ ] ABE (Access-Based Enumeration) no File Server
+- [x] Data Deduplication com agendamento noturno
+- [x] DFS Namespaces com namespace baseado em domínio
+- [x] Estrutura NTFS departamental com herança quebrada e Implicit Deny
+- [x] ABE — Access-Based Enumeration no Namespace DFS
+- [x] FSRM Quotas com template reutilizável
+- [x] File Screening com bloqueio de executáveis e extensões de ransomware
 - [ ] Auditoria avançada de eventos de diretório
 - [ ] Account Lockout Policy e política de complexidade de senhas
 - [ ] Mapeamento automático de unidades via GPO (Item-Level Targeting)
