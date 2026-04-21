@@ -25,6 +25,7 @@ Nesta primeira fase, preparámos a fundação do nosso Servidor de Ficheiros. Em
 | Evidência | Descrição |
 |-----------|-----------|
 | <img src="img/6.png" width="1000"> | **Tipo de Aprovisionamento (Thin):**<br>Configuração dinâmica onde o espaço só é alocado conforme o uso, permitindo técnicas de *Overprovisioning*. |
+| <img src="img/7.png" width="1000"> | **Overprovisioning e Write-back Cache:**<br>Devido ao provisionamento *Thin*, o sistema permite criar um disco virtual maior que a capacidade física real (Overprovisioning), diferindo custos de hardware.<br><br>**Performance (Write-back cache):** O servidor reserva uma área de cache rápido para absorver picos repentinos de gravação de dados (I/O spikes), evitando lentidão para o utilizador final durante horários de pico. |
 | <img src="img/8.png" width="1000"> | **Validação do SMB Multichannel:**<br>Validação via PowerShell.<br><br>Recurso que permite agregação de banda e tolerância a falhas em servidores com múltiplas interfaces de rede. |
 | <img src="img/9.png" width="1000"> | **Resultado Final (Volume E:):**<br>Volume formatado em NTFS, requisito obrigatório para as roles de Governança (FSRM) e Desduplicação. |
 
