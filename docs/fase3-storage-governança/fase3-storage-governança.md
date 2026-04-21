@@ -1,4 +1,4 @@
-# 📂 Fase 3: Storage Avançado e Governança de Dados
+# Fase 3: Storage Avançado e Governança de Dados
 
 Esta fase detalha a transformação do servidor `CXB-FS01` numa solução de armazenamento de classe empresarial, focada em alta disponibilidade, eficiência de espaço e segurança proativa.
 
