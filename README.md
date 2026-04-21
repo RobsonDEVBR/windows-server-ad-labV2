@@ -338,14 +338,20 @@ Em vez de distribuir Domain Admin, delegamos permissões específicas sobre as O
 
 Implementação de política restritiva de *User Rights Assignment* focada na mitigação de persistência de ameaças (mapeado no framework MITRE ATT&CK T1543).
 
-A regra de ouro do *Least Privilege* (Privilégio Mínimo) dita que contas interativas e humanas (mesmo as administrativas) não devem ter permissão para registrar e executar serviços em segundo plano.
+A regra de ouro do  (Privilégio Mínimo) dita que contas interativas e humanas (mesmo as administrativas) não devem ter permissão para registrar e executar serviços em segundo plano.
 
 * **Política Aplicada:** `Deny log on as a service` (Negar logon como um serviço).
 * **Alvo:** Grupo administrativo interativo (`GG-Admins-Caxambu`).
 * **Impacto de Segurança:** Se uma credencial administrativa for comprometida, o atacante não conseguirá utilizar essa conta para instalar um serviço malicioso e garantir persistência no servidor.
+### 🧠 Deep Dive Arquitetural: Por que não é o padrão da Microsoft?
 
-> 🧠 **Decisão Arquitetural e Risco Avaliado:**
-> Embora a documentação oficial da Microsoft recomende não configurar este bloqueio por padrão para evitar quebra de serviços legados, este laboratório foi desenhado sob a ótica de **Zero Trust e SecOps**. A decisão de aplicar este bloqueio aos grupos de administradores garante que serviços legítimos sejam operados exclusivamente por *Managed Service Accounts* (gMSA) ou contas de sistema nativas (`Local System` / `Network Service`), separando estritamente a identidade humana da identidade de máquina.
+Durante a fase de pesquisa para a implementação desta política, constatou-se que a documentação oficial da Microsoft recomenda **não atribuir este bloqueio por padrão**. Para um ambiente com foco em SecOps, essa recomendação levanta um questionamento válido. A decisão de seguir com o bloqueio (Hardening) neste laboratório baseia-se na compreensão profunda do ecossistema Microsoft:
+
+1. **Retrocompatibilidade e Dívida Técnica (O Legado):** Historicamente, muitos softwares corporativos de terceiros (ERPs, agentes de backup) foram desenvolvidos com a má prática de exigir credenciais de `Domain Admin` para a execução de seus serviços. A Microsoft mantém o sistema permissivo nativamente para não "quebrar" subitamente milhares de ambientes legados em todo o mundo.
+2. **Filosofia "Out-of-the-Box" vs. "Zero Trust":** A Microsoft entrega o Windows Server pronto para funcionar com o mínimo de atrito possível. No entanto, em infraestruturas modernas que adotam o modelo **Zero Trust** (como a desenhada neste laboratório), a premissa muda. É responsabilidade do Engenheiro/Arquiteto de Infraestrutura fechar as portas.
+3. **Identidade Humana vs. Identidade de Máquina:** Em um ambiente maduro, humanos não rodam serviços. A ativação desta GPO atua como uma barreira arquitetural que "força" a equipe de TI a abandonar o uso de credenciais humanas em serviços e adotar práticas seguras, como o uso de *Managed Service Accounts* (gMSA) ou contas nativas do sistema (`Local System` / `Network Service`).
+
+**Conclusão:** A implementação do `Deny log on as a service` neste laboratório é uma decisão consciente de aceitar a complexidade administrativa em troca de uma mitigação drástica contra a persistência de malwares e movimentação lateral (Lateral Movement) por contas comprometidas.
 
 | Evidência | Descrição |
 |-----------|-----------|
