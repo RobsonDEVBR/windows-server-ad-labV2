@@ -343,7 +343,7 @@ A regra de ouro do  (Privilégio Mínimo) dita que contas interativas e humanas 
 * **Política Aplicada:** `Deny log on as a service` (Negar logon como um serviço).
 * **Alvo:** Grupo administrativo interativo (`GG-Admins-Caxambu`).
 * **Impacto de Segurança:** Se uma credencial administrativa for comprometida, o atacante não conseguirá utilizar essa conta para instalar um serviço malicioso e garantir persistência no servidor.
-### 🧠 Deep Dive Arquitetural: Por que não é o padrão da Microsoft?
+### Deep Dive Arquitetural: Por que não é o padrão da Microsoft?
 
 Durante a fase de pesquisa para a implementação desta política, constatou-se que a documentação oficial da Microsoft recomenda **não atribuir este bloqueio por padrão**. Para um ambiente com foco em SecOps, essa recomendação levanta um questionamento válido. A decisão de seguir com o bloqueio (Hardening) neste laboratório baseia-se na compreensão profunda do ecossistema Microsoft:
 
