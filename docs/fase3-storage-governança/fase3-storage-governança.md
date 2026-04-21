@@ -45,6 +45,7 @@ Nesta segunda fase, transformámos o storage bruto num serviço de ficheiros int
 ### 2.2. Abstração de Rede via DFS Namespaces (DFS-N)
 | Evidência | Descrição |
 |-----------|-----------|
+| <img src="img/14.png" width="1000"> | **Criação Pasta:**<br>Criação na pasta E: |
 | <img src="img/13.png" width="1000"> | **Implementação do DFS-N:**<br>Criação do caminho universal `\\robson.local\Arquivos`. |
 | <img src="img/15.png" width="1000"> | **Decisão Arquitetural (Edit Settings):**<br>Alteração manual do caminho de `C:\DFSRoots` para `E:\Arquivos` para utilizar o Storage Pool otimizado. |
 | <img src="img/16.png" width="1000"> | **Namespace de Domínio:**<br>Configuração que garante que a migração de servidores físicos seja transparente para o utilizador final. |
