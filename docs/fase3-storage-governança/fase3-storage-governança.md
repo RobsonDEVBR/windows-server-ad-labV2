@@ -65,7 +65,7 @@ Nesta etapa, aplicamos o princípio do privilégio mínimo, garantindo que o ace
 | Evidência | Descrição |
 |-----------|-----------|
 | <img src="img/19.png" width="1000"> | **Segregação de Dados:**<br>A estrutura física no disco `E:` foi criada para espelhar as Unidades Organizacionais (UOs) do Active Directory.<br><br>Criamos os diretórios `ADM`, `TI` e `Publico`. |
-| <img src="img/20.png" width="1000"> | **Quebra de Herança (Princípio do Menor Privilégio):**<br>Foi desabilitada a herança de permissões vinda da raiz do disco.<br><br>Em um ambiente corporativo, pastas departamentais não devem herdar permissões genéricas. Ao quebrar a herança, removemos os grupos `Users` e `Authenticated Users`, garantindo que o acesso seja negado por padrão (*Implicit Deny*). |
+| <img src="img/20.png" width="1000"> | **Quebra de Herança (Princípio do Menor Privilégio):**<br>Foi desabilitada a herança de permissões vinda da raiz do disco.<br><br>Em um ambiente corporativo, pastas departamentais não devem herdar permissões genéricas. Ao quebrar a herança, removemos os grupos `Users` , garantindo que o acesso seja negado por padrão (*Implicit Deny*). |
 | <img src="img/21.png" width="1000"> | **Limpeza de ACL:**<br>Mantivemos os grupos `SYSTEM` e `Administrators` para garantir a continuidade de rotinas de backup e manutenção. |
 | <img src="img/22.png" width="1000"> | **Aplicação do Modelo AGDLP:**<br>As permissões foram concedidas estritamente a **Grupos Globais de Segurança**.<br><br>No exemplo da pasta `ADM`, o acesso de **Modificação (Modify)** foi atribuído ao grupo `GG-Admins-Caxambu`. |
 
