@@ -58,55 +58,40 @@ Nesta fase, implementamos a "blindagem" do servidor. O foco saiu da infraestrutu
 ---
 
 ### 3.1. Estrutura Departamental e Permissões NTFS
-<img src="img/19.png" width="800">
 
-> **Segregação de Dados:** A estrutura física no disco `E:` foi criada para espelhar as Unidades Organizacionais (UOs) do Active Directory. Criamos os diretórios `ADM`, `TI` e `Publico`.
+Nesta etapa, aplicamos o princípio do privilégio mínimo, garantindo que o acesso aos dados seja controlado por grupos de segurança e não por usuários individuais.
 
-<img src="img/20.png" width="800">
-
-> **Quebra de Herança (Princípio do Menor Privilégio):** > * **Ação:** Foi desabilitada a herança de permissões vinda da raiz do disco. 
-> * **Justificativa:** Em um ambiente corporativo, pastas departamentais não devem herdar permissões genéricas. Ao quebrar a herança, removemos os grupos `Users` e `Authenticated Users`, garantindo que o acesso seja negado por padrão (*Implicit Deny*).
-
-<img src="img/21.png" width="800">
-<img src="img/22.png" width="800">
-
-> **Aplicação do Modelo AGDLP:** As permissões foram concedidas estritamente a **Grupos Globais de Segurança**. No exemplo da pasta `ADM`, o acesso de **Modificação (Modify)** foi atribuído ao grupo `GG-Admins-Caxambu`. 
-> * *Nota:* Mantivemos os grupos `SYSTEM` e `Administrators` para garantir a continuidade de rotinas de backup e manutenção.
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 19](img/19.png)](img/19.png) | **Segregação de Dados:** A estrutura física no disco `E:` foi criada para espelhar as Unidades Organizacionais (UOs) do Active Directory. Criamos os diretórios `ADM`, `TI` e `Publico`. |
+| [![Storage 20](img/20.png)](img/20.png) | **Quebra de Herança (Princípio do Menor Privilégio):** Foi desabilitada a herança de permissões vinda da raiz do disco. Em um ambiente corporativo, pastas departamentais não devem herdar permissões genéricas. Ao quebrar a herança, removemos os grupos `Users` e `Authenticated Users`, garantindo que o acesso seja negado por padrão (*Implicit Deny*). |
+| [![Storage 21](img/21.png)](img/21.png) | **Limpeza de ACL:** Mantivemos os grupos `SYSTEM` e `Administrators` para garantir a continuidade de rotinas de backup e manutenção. |
+| [![Storage 22](img/22.png)](img/22.png) | **Aplicação do Modelo AGDLP:** As permissões foram concedidas estritamente a **Grupos Globais de Segurança**. No exemplo da pasta `ADM`, o acesso de **Modificação (Modify)** foi atribuído ao grupo `GG-Admins-Caxambu`. |
 
 ---
 
 ### 3.2. Access-Based Enumeration (ABE) - Invisibilidade Seletiva
-<img src="img/23-ABE.png" width="800">
 
-> **Configuração de UX e Segurança:** Habilitamos o **ABE** nas propriedades do Namespace DFS.
-> * **O que isso faz?** Se um usuário da TI acessar o caminho `\\robson.local\Arquivos`, a pasta `ADM` sequer aparecerá para ele. Isso reduz a curiosidade interna e evita chamados desnecessários ao suporte por "Acesso Negado", pois o usuário só enxerga o que pode abrir.
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 23](img/23-ABE.png)](img/23-ABE.png) | **Configuração de UX e Segurança:** Habilitamos o **ABE** nas propriedades do Namespace DFS. Se um usuário da TI acessar o caminho `\\robson.local\Arquivos`, a pasta `ADM` sequer aparecerá para ele. Isso reduz a curiosidade interna e evita chamados desnecessários ao suporte por "Acesso Negado", pois o usuário só enxerga o que pode abrir. |
 
 ---
 
 ### 3.3. Gestão de Cotas (FSRM Quotas)
-<img src="img/24.png" width="800">
 
-> **Controle de Crescimento:** Implementação de **Hard Quotas** de 10GB na pasta `ADM`.
-> * **Decisão Sênior:** Utilizamos a opção *"Derive properties from this quota template"*. Isso permite que, se no futuro precisarmos aumentar o espaço de todos os departamentos para 20GB, alteramos apenas o template central e a mudança será replicada automaticamente para todas as pastas vinculadas, garantindo escalabilidade na gestão.
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 24](img/24.png)](img/24.png) | **Controle de Crescimento:** Implementação de **Hard Quotas** de 10GB na pasta `ADM`. Utilizamos a opção *"Derive properties from this quota template"*. Isso permite que, se no futuro precisarmos aumentar o espaço de todos os departamentos para 20GB, alteramos apenas o template central e a mudança será replicada automaticamente para todas as pastas vinculadas, garantindo escalabilidade na gestão. |
 
 ---
 
 ### 3.4. Blindagem Anti-Ransomware e Triagem de Arquivos
-<img src="img/25.png" width="800">
 
-> **Criação de Dicionário de Ameaças (File Groups):** Criamos o grupo customizado `[SecOps] Bloqueio de Executáveis e Ransomware`. Foram incluídas extensões críticas como `.exe` (bloqueio de Shadow IT), `.bat`, `.ps1` (scripts maliciosos) e assinaturas de ransomware como `.crypt`, `.locky` e `.wannacry`.
-
-<img src="img/26.png" width="800">
-
-> **Template de Segurança Máxima:** Unificamos o bloqueio de arquivos multimídia (para economizar storage) com o bloqueio de executáveis/ransomware em um único template de **Triagem Ativa (Active Screening)**.
-
-<img src="img/27.png" width="800">
-
-> **Auditoria e Alerta (Event Log):** Configuramos a política para que toda tentativa de violação (ex: usuário tentando salvar um vírus ou um filme) gere um aviso no **Windows Event Log**. Isso permite monitoramento proativo via ferramentas de SIEM ou análise manual da TI.
-
-<img src="img/28.png" width="800">
-<img src="img/29.png" width="800">
-
-> **Aplicação em Cascata (Root Protection):** > * **Ação Final:** A política de triagem foi aplicada na raiz `E:\Arquivos`. 
-> * **Vantagem Arquitetural:** Ao aplicar na raiz utilizando o template customizado, todas as subpastas atuais e futuras herdam automaticamente a proteção. O servidor torna-se uma "fortaleza" onde o sistema de arquivos atua como a primeira linha de defesa contra ataques de criptografia de dados.
-Destaque de Portfólio:
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 25](img/25.png)](img/25.png) | **Criação de Dicionário de Ameaças (File Groups):** Criamos o grupo customizado `[SecOps] Bloqueio de Executáveis e Ransomware`. Foram incluídas extensões críticas como `.exe` (bloqueio de Shadow IT), `.bat`, `.ps1` (scripts maliciosos) e assinaturas de ransomware como `.crypt`, `.locky` e `.wannacry`. |
+| [![Storage 26](img/26.png)](img/26.png) | **Template de Segurança Máxima:** Unificamos o bloqueio de arquivos multimídia (para economizar storage) com o bloqueio de executáveis/ransomware em um único template de **Triagem Ativa (Active Screening)**. |
+| [![Storage 27](img/27.png)](img/27.png) | **Auditoria e Alerta (Event Log):** Configuramos a política para que toda tentativa de violação (ex: usuário tentando salvar um vírus ou um filme) gere um aviso no **Windows Event Log**. Isso permite monitoramento proativo via ferramentas de SIEM ou análise manual da TI. |
+| [![Storage 28](img/28.png)](img/28.png) | **Configuração de Triagem:** Detalhes da política de bloqueio impeditivo configurada no File System. |
+| [![Storage 29](img/29.png)](img/29.png) | **Aplicação em Cascata (Root Protection):** A política de triagem foi aplicada na raiz `E:\Arquivos`. Com isso, todas as subpastas atuais e futuras herdam automaticamente a proteção. O servidor torna-se uma "fortaleza" onde o sistema de arquivos atua como a primeira linha de defesa contra ataques de criptografia de dados. |
