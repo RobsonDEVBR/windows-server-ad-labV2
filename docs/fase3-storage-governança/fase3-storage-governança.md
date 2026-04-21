@@ -1,104 +1,82 @@
-# Fase 3: Storage Avançado e Governança de Dados
+# 📂 Fase 3: Storage Avançado e Governança de Dados
 
-# 1. Arquitetura Base de Armazenamento (Storage Spaces)
-
-Essa foi a parte onde eu montei a fundação do servidor de arquivos (`CXB-FS01`). Em vez de sair criando partição C, D, E do jeito antigo, resolvi usar **Storage Spaces** desde o começo. A ideia era simples: poder crescer o disco depois sem dor de cabeça e já deixar o storage preparado para as roles de arquivos.
-
-Abaixo eu mostro passo a passo o que fiz e por que escolhi cada opção.
+Esta fase detalha a transformação do servidor `CXB-FS01` numa solução de armazenamento de classe empresarial, focada em alta disponibilidade, eficiência de espaço e segurança proativa.
 
 ---
 
-### 1. Topologia do Laboratório
-<img src="img/1.png" width="800">
+## 1. Arquitetura Base de Armazenamento (Storage Spaces)
 
-> Aqui é o Hyper-V com as 4 VMs do lab (`CXB-DC01`, `DC02`, `FS01` e `WIN10`). Separei o file server em uma VM só pra ele, assim o tráfego de arquivos não compete com o AD.
+Nesta primeira fase, preparámos a fundação do nosso Servidor de Ficheiros. Em vez de utilizar partições simples e rígidas, a arquitetura foi desenhada utilizando **Storage Spaces**, permitindo aprovisionamento inteligente, expansão futura e alta performance de rede.
 
----
+### 1.1. Topologia e Aprovisionamento Físico
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 1](img/1.png)](img/1.png) | **Topologia do Laboratório:** Visão do Hyper-V com os nós da infraestrutura (`CXB-DC01`, `DC02`, `FS01` e `WIN10`). O servidor de ficheiros foi isolado numa VM dedicada. |
+| [![Storage 2](img/2.png)](img/2.png) | **Aprovisionamento Físico:** Adição de 3 discos virtuais (VHDX) de 20GB cada à controladora SCSI do servidor. |
 
-### 2. Provisionamento Físico (Discos Virtuais)
-<img src="img/2.png" width="800">
+### 1.2. Criação do Storage Pool e Layout
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 3](img/3.png)](img/3.png) | **Storage Pool:** Unificação dos 3 discos no `POOL-DADOS-CXB`. Isto abstrai o hardware físico, permitindo gerir o armazenamento como um recurso único e flexível. |
+| [![Storage 4](img/4.png)](img/4.png) | **Conceito de Storage Tiering:** Explicação do uso de SSDs (Hot Data) e HDDs (Cold Data) para otimização de custo e performance em ambientes de produção. |
+| [![Storage 5](img/5.png)](img/5.png) | **Layout de Armazenamento (Simple):** Escolhido para maximizar a performance de I/O e aproveitar a capacidade total (60GB) no ambiente de laboratório. |
 
-> Adicionei 3 VHDX de 20GB cada na controladora SCSI do FS01. Deixei como dinâmico porque é lab e eu não queria comer espaço do meu SSD à toa.
-
----
-
-### 3. Criação do Storage Pool
-<img src="img/3.png" width="800">
-
-> Peguei os 3 discos zerados e juntei tudo num pool só, chamei de `POOL-DADOS-CXB`. Com o pool eu esqueço o disco físico e trato tudo como um único tanque de armazenamento.
-
----
-
-### 4. Nomeação e Conceito de Storage Tiering
-<img src="img/4.png" width="800">
-
-> O Tiering ficou cinza porque meus 3 discos são iguais. Em produção eu usaria SSD + HDD aqui, o Windows joga arquivo quente pro SSD e o frio pro HDD sozinho. No lab só deixei anotado pra lembrar.
+### 1.3. Otimização e Entrega do Volume
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 6](img/6.png)](img/6.png) | **Tipo de Aprovisionamento (Thin):** Configuração dinâmica onde o espaço só é alocado conforme o uso, permitindo técnicas de *Overprovisioning*. |
+| [![Storage 7](img/7.png)](img/7.png) | **Validação do SMB Multichannel:** Validação via PowerShell. Recurso que permite agregação de banda e tolerância a falhas em servidores com múltiplas interfaces de rede. |
+| [![Storage 8](img/8.png)](img/8.png) | **Resultado Final (Volume E:):** Volume formatado em NTFS, requisito obrigatório para as roles de Governança (FSRM) e Desduplicação. |
 
 ---
-
-### 5. Layout de Armazenamento (Simple)
-<img src="img/5.png" width="800">
-
-> Escolhi **Simple**. Não é porque é mais fácil, é porque meus 3 VHDX estão no mesmo SSD físico. Se eu colocasse Mirror eu só ia perder espaço sem ganhar proteção real. Em servidor físico eu iria de Mirror ou Parity sem pensar duas vezes.
-
----
-
-### 6. Tipo de Provisionamento (Thin)
-<img src="img/6.png" width="800">
-
-> Deixei em **Thin**. O Windows acha que tem o espaço todo, mas só ocupa no host quando eu realmente gravo algo. É o que a gente faz em nuvem pra não desperdiçar disco.
-
----
-
-### 7. Overprovisioning e Write-back Cache
-<img src="img/7.png" width="800">
-
-> Com Thin eu consegui criar um disco maior que o pool. Isso é overprovisioning, técnica que provedor usa pra vender mais do que tem e comprar disco depois. Ativei o write-back cache também, ele segura pico de gravação e o usuário não sente lag.
-
----
-
-### 8. Validação do SMB Multichannel
-<img src="img/8.png" width="800">
-
-> Rodei `Get-SmbServerConfiguration` só pra confirmar. O Multichannel já vem ligado. No lab com uma placa não muda nada, mas se eu colocar duas NICs de 1Gb ele soma a banda e se um cabo cair o outro segura.
-
----
-
-### 9. Resultado Final (Volume E:)
-<img src="img/9.png" width="800">
-
-> Formatei o volume como `Dados-CXB` em **NTFS** no E:. Precisa ser NTFS porque dedup e FSRM não funcionam direito em outro sistema de arquivos.
 
 ## 2. Estrutura de Dados e Otimização (Dedup e DFS-N)
 
-Depois do storage pronto, transformei aquele disco cru em um serviço de arquivos de verdade. O foco aqui era economizar espaço e criar um caminho que não quebrasse se eu trocasse de servidor.
+Nesta segunda fase, transformámos o storage bruto num serviço de ficheiros inteligente, maximizando a eficiência do disco e criando uma camada de abstração de rede.
+
+### 2.1. Instalação de Roles e Data Deduplication
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 10](img/10.png)](img/10.png) | **Aprovisionamento de Roles:** Instalação de Data Deduplication, DFS Namespaces, DFS Replication e FSRM. |
+| [![Storage 11](img/11.png)](img/11.png) | **Seleção do Volume Alvo:** Aplicação da desduplicação exclusivamente no volume **E: (Dados-CXB)** para evitar overhead no disco do sistema operativo. |
+| [![Storage 12](img/12.png)](img/12.png) | **Agendamento Inteligente:** Configuração da "limpeza pesada" para as 02:00 AM, garantindo que a CPU esteja 100% disponível para os utilizadores durante o dia. |
+
+### 2.2. Abstração de Rede via DFS Namespaces (DFS-N)
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 13](img/13.png)](img/13.png) | **Implementação do DFS-N:** Criação do caminho universal `\\robson.local\Arquivos`. |
+| [![Storage 15](img/15.png)](img/15.png) | **Decisão Arquitetural (Edit Settings):** Alteração manual do caminho de `C:\DFSRoots` para `E:\Arquivos` para utilizar o Storage Pool otimizado. |
+| [![Storage 16](img/16.png)](img/16.png) | **Namespace de Domínio:** Configuração que garante que a migração de servidores físicos seja transparente para o utilizador final. |
+| [![Storage 18](img/18.png)](img/18.png) | **Validação:** Ponto de entrada universal ativo e saudável. |
 
 ---
 
-### 2.1. Instalação de Roles e Recursos Críticos
-<img src="img/10.png" width="800">
+## 3. Governança e Segurança (FSRM, NTFS e ABE)
 
-> Instalei Data Deduplication, DFS Namespaces, DFS Replication e FSRM. É o combo básico de qualquer file server corporativo hoje.
+Nesta fase, implementámos a "blindagem" do servidor, garantindo proteção lógica, controlo de acesso granular e defesa contra Ransomware.
+
+### 3.1. Estrutura Departamental e Permissões NTFS
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 19](img/19.png)](img/19.png) | **Segregação de Dados:** Criação dos diretórios `ADM`, `TI` e `Publico` espelhando as OUs do Active Directory. |
+| [![Storage 20](img/20.png)](img/20.png) | **Hardening (Quebra de Herança):** Desativação da herança para garantir que cada pasta departamental tenha a sua própria ACL isolada (*Implicit Deny*). |
+| [![Storage 21](img/21.png)](img/21.png) | **Limpeza de ACL:** Remoção de grupos genéricos (`Users`), mantendo apenas acessos explícitos, `SYSTEM` e `Administrators`. |
+| [![Storage 22](img/22.png)](img/22.png) | **Metodologia AGDLP:** Atribuição de acesso `Modify` ao grupo global `GG-Admins-Caxambu` na pasta correspondente. |
+
+### 3.2. ABE e Gestão de Cotas
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage ABE](img/23-ABE.png)](img/23-ABE.png) | **Access-Based Enumeration (ABE):** Configuração para que pastas às quais o utilizador não tem acesso NTFS fiquem invisíveis na rede. |
+| [![Storage 24](img/24.png)](img/24.png) | **Gestão de Cotas:** Implementação de *Hard Quotas* de 10GB via Template, garantindo escalabilidade na administração do espaço. |
+
+### 3.3. Blindagem Anti-Ransomware e Triagem Ativa
+| Evidência | Descrição |
+|-----------|-----------|
+| [![Storage 25](img/25.png)](img/25.png) | **Dicionário de Ameaças:** Criação do grupo `[SecOps]` bloqueando `.exe` (Shadow IT) e extensões de Ransomware (`.crypt`, `.locky`, `.wannacry`). |
+| [![Storage 26](img/26.png)](img/26.png) | **Template de Segurança Máxima:** Unificação do bloqueio de média e executáveis maliciosos num modelo de **Active Screening**. |
+| [![Storage 27](img/27.png)](img/27.png) | **Auditoria (Event Log):** Configuração de alertas automáticos no log do Windows para cada tentativa de violação de política. |
+| [![Storage 28](img/28.png)](img/28.png) | **Configuração de Triagem:** Detalhes da política de bloqueio impeditivo. |
+| [![Storage 29](img/29.png)](img/29.png) | **Proteção em Cascata:** Aplicação da triagem na raiz `E:\Arquivos`, protegendo todo o sistema de ficheiros de forma hereditária. |
 
 ---
-
-### 2.2. Otimização de Storage: Data Deduplication
-<img src="img/11.png" width="800">
-
-> Apliquei a dedup só no E:. Deixei o C: de fora pra não arriscar performance do sistema.
-
-<img src="img/12.png" width="800">
-
-> Configurei o agendamento: otimização em background o tempo todo e uma faxina pesada às 02:00 por 6 horas. Coloquei de madrugada pra não brigar com usuário usando arquivo.
-
----
-
-### 2.3. Abstração de Rede: DFS Namespaces (DFS-N)
-<img src="img/13.png" width="800">
-
-> Criei o DFS pra esconder o servidor físico atrás de um nome lógico.
-
-<img src="img/15.png" width="800">
-
-> Errei na primeira tentativa e deixei o caminho padrão `C:\DFSRoots`. Percebi que assim eu ignorava todo o pool que acabei de criar. Apaguei e forcei para **`E:\Arquivos`**.
-> * Por que mudei: se ficasse no C:, nada de dedup ou quota
+> **Nota Técnica:** Implementámos uma **Exceção de Triagem** na subpasta `TI`, permitindo que o grupo de tecnologia armazene scripts `.ps1` necessários para automação, mantendo o bloqueio ativo para o restante da empresa.
