@@ -1,7 +1,5 @@
 # Fase 3: Storage Avançado e Governança de Dados
 
-## 1. Arquitetura Base de Armazenamento (Storage Spaces)
-
 # 1. Arquitetura Base de Armazenamento (Storage Spaces)
 
 Nesta primeira fase, preparamos a fundação do nosso Servidor de Arquivos (`CXB-FS01`). Em vez de utilizar partições simples e engessadas, a arquitetura foi desenhada utilizando **Storage Spaces**, permitindo provisionamento inteligente, expansão futura e alta performance de rede.
