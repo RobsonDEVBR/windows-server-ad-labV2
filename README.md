@@ -336,10 +336,26 @@ Em vez de distribuir Domain Admin, delegamos permissões específicas sobre as O
 
 ### 12. Atribuição de Direitos — Deny Logon as a Service
 
-> ⚠️ **Evidências sendo adicionadas conforme implementação avança.**
+Implementação de política restritiva de *User Rights Assignment* focada na mitigação de persistência de ameaças (mapeado no framework MITRE ATT&CK T1543).
 
-Impede que uma conta administrativa comprometida seja usada para registrar um serviço malicioso e manter persistência (MITRE ATT&CK T1543).
+A regra de ouro do *Least Privilege* (Privilégio Mínimo) dita que contas interativas e humanas (mesmo as administrativas) não devem ter permissão para registrar e executar serviços em segundo plano.
 
+* **Política Aplicada:** `Deny log on as a service` (Negar logon como um serviço).
+* **Alvo:** Grupo administrativo interativo (`GG-Admins-Caxambu`).
+* **Impacto de Segurança:** Se uma credencial administrativa for comprometida, o atacante não conseguirá utilizar essa conta para instalar um serviço malicioso e garantir persistência no servidor.
+
+> 🧠 **Decisão Arquitetural e Risco Avaliado:**
+> Embora a documentação oficial da Microsoft recomende não configurar este bloqueio por padrão para evitar quebra de serviços legados, este laboratório foi desenhado sob a ótica de **Zero Trust e SecOps**. A decisão de aplicar este bloqueio aos grupos de administradores garante que serviços legítimos sejam operados exclusivamente por *Managed Service Accounts* (gMSA) ou contas de sistema nativas (`Local System` / `Network Service`), separando estritamente a identidade humana da identidade de máquina.
+
+| Evidência | Descrição |
+|-----------|-----------|
+| <img src="img/Deny1.png" width="1000"> | **Criação da GPO:**<br>Criação de uma GPO modular específica para esta finalidade, mantendo a `Default Domain Policy` limpa e seguindo as melhores práticas de administração. |
+| <img src="img/Deny2.png" width="1000"> | **Navegação de Segurança:**<br>Acesso ao editor de políticas de grupo, navegando até o cofre local de direitos: `Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > User Rights Assignment`. |
+| <img src="img/Deny3.png" width="1000"> | **Seleção da Política:**<br>Localização da política alvo `Deny log on as a service`, que por padrão não possui configurações definidas para evitar quebra de compatibilidade em ambientes legados. |
+| <img src="img/Deny4.png" width="1000"> | **Configuração do Bloqueio:**<br>A política foi ativada e o grupo de administradores delegados `ROBSON\GG-Admins-Caxambu` foi explicitamente adicionado à lista de restrição. |
+| <img src="img/Deny5.png" width="1000"> | **Aplicação da GPO:**<br>A política de *Hardening* configurada e pronta para ser distribuída pela infraestrutura do domínio. |
+| <img src="img/Deny6.png" width="1000"> | **Proteção do Core (Tier 0):**<br>Para garantir a segurança global, a GPO foi vinculada diretamente na UO **Domain Controllers**.<br><br>Isso blinda o coração da infraestrutura, impedindo que administradores delegados criem serviços mesmo nos servidores mais críticos. |
+| <img src="img/Deny7.png" width="1000"> | **Validação e Eficácia (Erro 1069):**<br>Teste prático simulando a ação de um atacante. Ao tentar forçar a inicialização do serviço `Print Spooler` utilizando as credenciais do `Admin Caxambu`, o sistema operacional intercepta a ação e bloqueia o acesso imediatamente, gerando a falha de logon. |
 ---
 
 ### 13. Auditoria Avançada de Eventos
