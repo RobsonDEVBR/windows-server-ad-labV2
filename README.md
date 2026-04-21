@@ -336,32 +336,36 @@ Em vez de distribuir Domain Admin, delegamos permissões específicas sobre as O
 
 ### 12. Atribuição de Direitos — Deny Logon as a Service
 
-Implementação de política restritiva de *User Rights Assignment* focada na mitigação de persistência de ameaças (mapeado no framework MITRE ATT&CK T1543).
+Política de *User Rights Assignment* para bloquear persistência via serviços maliciosos — mapeado no MITRE ATT&CK como T1543.
 
-A regra de ouro do  (Privilégio Mínimo) dita que contas interativas e humanas (mesmo as administrativas) não devem ter permissão para registrar e executar serviços em segundo plano.
+O princípio do Menor Privilégio (PoLP) é claro nesse ponto: contas humanas, mesmo as administrativas, não deveriam ter permissão para registrar serviços em segundo plano. Se uma credencial do `GG-Admins-Caxambu` for comprometida, o atacante não vai conseguir instalar um serviço malicioso e garantir persistência — a política corta esse caminho antes.
 
-* **Política Aplicada:** `Deny log on as a service` (Negar logon como um serviço).
-* **Alvo:** Grupo administrativo interativo (`GG-Admins-Caxambu`).
-* **Impacto de Segurança:** Se uma credencial administrativa for comprometida, o atacante não conseguirá utilizar essa conta para instalar um serviço malicioso e garantir persistência no servidor.
-### Deep Dive Arquitetural: Por que não é o padrão da Microsoft?
+---
 
-Durante a fase de pesquisa para a implementação desta política, constatou-se que a documentação oficial da Microsoft recomenda **não atribuir este bloqueio por padrão**. Para um ambiente com foco em SecOps, essa recomendação levanta um questionamento válido. A decisão de seguir com o bloqueio (Hardening) neste laboratório baseia-se na compreensão profunda do ecossistema Microsoft:
+#### Por que a Microsoft não habilita isso por padrão?
 
-1. **Retrocompatibilidade e Dívida Técnica (O Legado):** Historicamente, muitos softwares corporativos de terceiros (ERPs, agentes de backup) foram desenvolvidos com a má prática de exigir credenciais de `Domain Admin` para a execução de seus serviços. A Microsoft mantém o sistema permissivo nativamente para não "quebrar" subitamente milhares de ambientes legados em todo o mundo.
-2. **Filosofia "Out-of-the-Box" vs. "Zero Trust":** A Microsoft entrega o Windows Server pronto para funcionar com o mínimo de atrito possível. No entanto, em infraestruturas modernas que adotam o modelo **Zero Trust** (como a desenhada neste laboratório), a premissa muda. É responsabilidade do Engenheiro/Arquiteto de Infraestrutura fechar as portas.
-3. **Identidade Humana vs. Identidade de Máquina:** Em um ambiente maduro, humanos não rodam serviços. A ativação desta GPO atua como uma barreira arquitetural que "força" a equipe de TI a abandonar o uso de credenciais humanas em serviços e adotar práticas seguras, como o uso de *Managed Service Accounts* (gMSA) ou contas nativas do sistema (`Local System` / `Network Service`).
+Durante a pesquisa para implementar essa política, ficou claro o motivo da Microsoft deixar o sistema permissivo nativamente — e vale documentar o raciocínio:
 
-**Conclusão:** A implementação do `Deny log on as a service` neste laboratório é uma decisão consciente de aceitar a complexidade administrativa em troca de uma mitigação drástica contra a persistência de malwares e movimentação lateral (Lateral Movement) por contas comprometidas.
+**Dívida técnica e legado.** Softwares corporativos mais antigos (ERPs, agentes de backup) foram escritos com a má prática de exigir `Domain Admin` para rodar seus serviços. A Microsoft não fecha essa porta por padrão para não quebrar esses ambientes na hora de aplicar um patch.
+
+**Windows vem configurado para funcionar, não para ser seguro.** O objetivo out-of-the-box é zero atrito. Em arquiteturas Zero Trust, fechar essas portas é responsabilidade do engenheiro — não vem pronto.
+
+**Humanos não rodam serviços.** Em ambientes maduros, essa separação é obrigatória. Habilitar essa GPO é uma forma de forçar a equipe a abandonar credenciais humanas em serviços e migrar para *Managed Service Accounts* (gMSA) ou contas nativas como `Local System` e `Network Service`.
+
+A decisão de implementar o bloqueio aqui é consciente: aceita-se a complexidade administrativa em troca de uma mitigação real contra persistência de malware e movimentação lateral por contas comprometidas.
+
+---
 
 | Evidência | Descrição |
 |-----------|-----------|
-| <img src="img/Deny1.png" width="1000"> | **Criação da GPO:**<br>Criação de uma GPO modular específica para esta finalidade, mantendo a `Default Domain Policy` limpa e seguindo as melhores práticas de administração. |
-| <img src="img/Deny2.png" width="1000"> | **Navegação de Segurança:**<br>Acesso ao editor de políticas de grupo, navegando até o cofre local de direitos: `Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > User Rights Assignment`. |
-| <img src="img/Deny3.png" width="1000"> | **Seleção da Política:**<br>Localização da política alvo `Deny log on as a service`, que por padrão não possui configurações definidas para evitar quebra de compatibilidade em ambientes legados. |
-| <img src="img/Deny4.png" width="1000"> | **Configuração do Bloqueio:**<br>A política foi ativada e o grupo de administradores delegados `ROBSON\GG-Admins-Caxambu` foi explicitamente adicionado à lista de restrição. |
-| <img src="img/Deny5.png" width="1000"> | **Aplicação da GPO:**<br>A política de *Hardening* configurada e pronta para ser distribuída pela infraestrutura do domínio. |
-| <img src="img/Deny6.png" width="1000"> | **Proteção do Core (Tier 0):**<br>Para garantir a segurança global, a GPO foi vinculada diretamente na UO **Domain Controllers**.<br><br>Isso blinda o coração da infraestrutura, impedindo que administradores delegados criem serviços mesmo nos servidores mais críticos. |
-| <img src="img/Deny7.png" width="1000"> | **Validação e Eficácia (Erro 1069):**<br>Teste prático simulando a ação de um atacante. Ao tentar forçar a inicialização do serviço `Print Spooler` utilizando as credenciais do `Admin Caxambu`, o sistema operacional intercepta a ação e bloqueia o acesso imediatamente, gerando a falha de logon. |
+| <img src="img/Deny1.png" width="1000"> | **Criação da GPO:**<br>GPO modular específica para esse fim, mantendo a `Default Domain Policy` limpa — boa prática para facilitar troubleshooting futuro. |
+| <img src="img/Deny2.png" width="1000"> | **Navegação no Editor:**<br>`Computer Configuration > Policies > Windows Settings > Security Settings > Local Policies > User Rights Assignment` |
+| <img src="img/Deny3.png" width="1000"> | **Seleção da Política:**<br>`Deny log on as a service` — sem configuração definida por padrão, exatamente para preservar a compatibilidade com sistemas legados. |
+| <img src="img/Deny4.png" width="1000"> | **Configuração do Bloqueio:**<br>Política ativada com o grupo `ROBSON\GG-Admins-Caxambu` adicionado explicitamente à lista de restrição. |
+| <img src="img/Deny5.png" width="1000"> | **GPO Configurada:**<br>Política de hardening pronta para distribuição via domínio. |
+| <img src="img/Deny6.png" width="1000"> | **Vinculação na OU Domain Controllers (Tier 0):**<br>A GPO foi aplicada diretamente nos DCs — o núcleo da infraestrutura. Administradores delegados não conseguem criar serviços nem nos servidores mais críticos. |
+| <img src="img/Deny7.png" width="1000"> | **Validação — Erro 1069:**<br>Teste simulando o comportamento de um atacante com credenciais comprometidas. Ao tentar forçar o `Print Spooler` com a conta `Admin Caxambu`, o SO bloqueia imediatamente com falha de logon (erro 1069 — *The service did not start due to a logon failure*). |
+
 ---
 
 ### 13. Auditoria Avançada de Eventos
