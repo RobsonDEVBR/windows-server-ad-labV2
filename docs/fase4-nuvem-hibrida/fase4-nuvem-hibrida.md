@@ -1,6 +1,8 @@
 # Fase 4: Identidade Híbrida — AD DS + Microsoft Entra ID
 
-O objetivo desta fase é conectar o AD local ao Entra ID para que os usuários de Caxambu e BH tenham uma identidade única na nuvem e no domínio — mesmo login para o Windows, Microsoft 365 e qualquer serviço SaaS integrado ao tenant (SSO). O método de sincronização escolhido foi **Password Hash Sync (PHS)**.
+O objetivo desta fase é conectar o AD local ao Entra ID para que os usuários de Caxambu e BH tenham uma identidade unificada — a mesma senha para o Windows local e para serviços em nuvem integrados ao tenant. O método de sincronização escolhido foi **Password Hash Sync (PHS)**.
+
+> **PHS vs SSO:** sincronizar a senha não é a mesma coisa que SSO. Com PHS, o usuário tem a mesma senha nos dois ambientes, mas ainda precisa digitá-la ao acessar serviços de nuvem pelo browser. SSO de verdade — entrar no Microsoft 365 sem digitar nada, só por estar logado no Windows — exige **Seamless SSO**, uma configuração adicional dentro do próprio Entra Connect que distribui um GPO com a URL do Entra na zona de Intranet das estações. Fica como próximo passo desta fase.
 
 > **Nota:** O Entra Connect foi instalado no próprio `CXB-DC01` por limitação de recursos do lab. Em produção, o correto é usar um servidor membro dedicado para essa função — o DC não deveria acumular mais uma role crítica.
 
@@ -17,7 +19,7 @@ Comecei pelo Cloud Sync, que é o método mais recente da Microsoft — um agent
 | [![3](img/3.png)](img/3.png) | Domínio `robson.local` vinculado com credenciais de administrador para leitura do diretório |
 | [![4](img/4.png)](img/4.png) | Revisão dos parâmetros antes de registrar o agente no Azure |
 | [![5](img/5.png)](img/5.png) | Agente aparecendo como "Ativo" no portal Entra — comunicação via NAT funcionando |
-| [![6](img/6.png)](img/6.png) | Bloqueio: o Cloud Sync exige licença P1/P2 para funcionar. O trial da Microsoft pede CNPJ ou cartão para liberar — fim da linha para o lab |
+| [![6](img/6.png)](img/6.png) | Bloqueio: o trial da Microsoft exige CNPJ ou cartão para ativação — sem isso, o agente fica registrado mas a sincronização não flui. Cloud Sync com PHS básico é gratuito; o problema foi a ativação do tenant, não licenciamento |
 
 ---
 
@@ -38,6 +40,6 @@ A diferença principal em relação ao Cloud Sync: o Connect Classic instala um 
 
 ## Resultado
 
-Os usuários e grupos criados localmente em Caxambu e BH estão sincronizados e visíveis no portal Microsoft Entra. A base para SSO está estabelecida — mesma credencial para login no Windows e nos serviços em nuvem integrados ao tenant.
+Os usuários e grupos criados localmente em Caxambu e BH estão sincronizados e visíveis no portal Microsoft Entra. A senha é a mesma nos dois ambientes — o usuário acessa serviços de nuvem com a mesma credencial do domínio, mas ainda precisa digitá-la no browser. Para eliminar esse passo e ter SSO de fato, o próximo passo é habilitar o **Seamless SSO** dentro do Entra Connect e distribuir o GPO de zona de Intranet nas estações.
 
-O bloqueio do Cloud Sync por licenciamento virou um exercício de diagnóstico útil: entender por que a Microsoft separou os dois métodos e o que cada um exige operacionalmente é parte do aprendizado desta fase.
+O bloqueio do Cloud Sync virou um exercício de diagnóstico útil: entender que o problema era a ativação do trial — não licenciamento — e que PHS básico é gratuito nos dois métodos é parte do aprendizado desta fase.
