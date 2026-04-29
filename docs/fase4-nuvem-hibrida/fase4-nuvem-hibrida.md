@@ -68,7 +68,8 @@ Dentro do Entra Connect, em `Customize synchronization options > Domain and OU f
 **Hybrid Join nos DCs:**
  
 Se o objetivo não é gerenciar estações via Intune, a opção `Computers` deve ser desmarcada no OU filtering. Sem isso, `CXB-DC01`, `CXB-DC02` e `WIN10` vão tentar se registrar como dispositivos no Entra, gerando erros no Event Log e objetos que não têm razão de existir no portal.
- 
+| Evidência | Correção|
+|-------|--------| 
 | [![Acesso a Customização](img/7.1.png)](img/7.1.png) | **Reconfiguração do Motor:** Iniciei o assistente do *Azure AD Connect* no servidor e selecionei **"Customize synchronization options"** para alterar o escopo do motor de sincronização pré-existente. |
 | [![Filtragem de OU](img/7.2.png)](img/7.2.png) | **Implementação de Domain/OU Filtering:** Na ecrã de escopo, desmarquei o diretório raiz. **Tomei a decisão proativa de excluir contêineres nativos como `Users` (que contém o Domain Admin) e `Computers` (para evitar o Hybrid Join involuntário de servidores infraestruturais).** O filtro foi restringido exclusivamente às OUs corporativas de Caxambu e Belo Horizonte. |
 ---
