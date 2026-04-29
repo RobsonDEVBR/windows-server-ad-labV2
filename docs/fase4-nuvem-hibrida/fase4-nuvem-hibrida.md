@@ -19,7 +19,7 @@ Comecei pelo Cloud Sync, que é o método mais recente da Microsoft — um agent
 | [![3](img/3.png)](img/3.png) | Domínio `robson.local` vinculado com credenciais de administrador para leitura do diretório |
 | [![4](img/4.png)](img/4.png) | Revisão dos parâmetros antes de registrar o agente no Azure |
 | [![5](img/5.png)](img/5.png) | Agente aparecendo como "Ativo" no portal Entra — comunicação via NAT funcionando |
-| [![6](img/6.png)](img/6.png) | Bloqueio: o trial da Microsoft exige CNPJ ou cartão para ativação — sem isso, o agente fica registrado mas a sincronização não flui. Cloud Sync com PHS básico é gratuito; o problema foi a ativação do tenant, não licenciamento |
+| [![6](img/6.png)](img/6.png) | Bloqueio: o trial da Microsoft exige CNPJ ou cartão para ativação — Além do mais essa forma de sincronização ainda não é totalmente suportada para o windows server 2025, o uso foi feito para fins didáticos de demonstração. |
 
 ---
 
@@ -37,9 +37,42 @@ A diferença principal em relação ao Cloud Sync: o Connect Classic instala um 
 | [![10](img/10.png)](img/10.png) | Synchronization Service Manager mostrando **Success** em todas as etapas de Import e Export |
 
 ---
-
+## ⚠️ O que não deveria ter sido sincronizado
+ 
+A instalação expressa sincroniza tudo por padrão — todos os usuários, todos os grupos, todos os computadores, incluindo contas internas como `Administrator` e `KRBTGT`, e os próprios DCs como objetos de dispositivo. Isso precisa de atenção antes de deixar o sync rodar em qualquer ambiente, mesmo em lab.
+ 
+**O problema do hash de admin na nuvem:**
+ 
+PHS não sobe a senha em texto claro, mas sobe o hash. Hash de `Administrator` no Entra significa que um vazamento de credencial cloud dá ao atacante a mesma senha do domain admin local — sem precisar tocar no AD. A Microsoft recomenda explicitamente não sincronizar contas administrativas nem contas de serviço.
+ 
+**O que o OU Filtering deveria ter filtrado:**
+ 
+Dentro do Entra Connect, em `Customize synchronization options > Domain and OU filtering`, o correto é marcar apenas as OUs com usuários reais de negócio:
+ 
+```
+❌ Builtin            ← Administrator, Guest, KRBTGT
+❌ COMPUTADORES       ← evita Hybrid Join indevido
+❌ Domain Controllers ← DCs não devem aparecer como dispositivos no Entra
+```
+ 
+**Contas que nunca devem ser sincronizadas:**
+ 
+| Conta | Motivo |
+|-------|--------|
+| `Administrator` | Hash de domain admin exposto no Entra |
+| `KRBTGT` | Sem uso legítimo na nuvem, polui o diretório |
+| `Guest` | Conta desabilitada sem razão de existir no tenant |
+| Contas de serviço | Credenciais de serviço não devem ter identidade cloud |
+| Objetos de computador dos DCs | DCs tentando Hybrid Join geram erros contínuos no Event Log e objetos inválidos no portal |
+ 
+**Hybrid Join nos DCs:**
+ 
+Se o objetivo não é gerenciar estações via Intune, a opção `Computers` deve ser desmarcada no OU filtering. Sem isso, `CXB-DC01`, `CXB-DC02` e `WIN10` vão tentar se registrar como dispositivos no Entra, gerando erros no Event Log e objetos que não têm razão de existir no portal.
+ 
+| [![Acesso a Customização](img/7.1.png)](img/7.1.png) | **Reconfiguração do Motor:** Iniciei o assistente do *Azure AD Connect* no servidor e selecionei **"Customize synchronization options"** para alterar o escopo do motor de sincronização pré-existente. |
+| [![Filtragem de OU](img/7.2.png)](img/7.2.png) | **Implementação de Domain/OU Filtering:** Na ecrã de escopo, desmarquei o diretório raiz. **Tomei a decisão proativa de excluir contêineres nativos como `Users` (que contém o Domain Admin) e `Computers` (para evitar o Hybrid Join involuntário de servidores infraestruturais).** O filtro foi restringido exclusivamente às OUs corporativas de Caxambu e Belo Horizonte. |
+---
 ## Resultado
 
 Os usuários e grupos criados localmente em Caxambu e BH estão sincronizados e visíveis no portal Microsoft Entra. A senha é a mesma nos dois ambientes — o usuário acessa serviços de nuvem com a mesma credencial do domínio, mas ainda precisa digitá-la no browser. Para eliminar esse passo e ter SSO de fato, o próximo passo é habilitar o **Seamless SSO** dentro do Entra Connect e distribuir o GPO de zona de Intranet nas estações.
 
-O bloqueio do Cloud Sync virou um exercício de diagnóstico útil: entender que o problema era a ativação do trial — não licenciamento — e que PHS básico é gratuito nos dois métodos é parte do aprendizado desta fase.
