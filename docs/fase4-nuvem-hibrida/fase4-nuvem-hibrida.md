@@ -50,9 +50,10 @@ PHS não sobe a senha em texto claro, mas sobe o hash. Hash de `Administrator` n
 Dentro do Entra Connect, em `Customize synchronization options > Domain and OU filtering`, o correto é marcar apenas as OUs com usuários reais de negócio:
  
 ```
-❌ Builtin            ← Administrator, Guest, KRBTGT
-❌ COMPUTADORES       ← evita Hybrid Join indevido
-❌ Domain Controllers ← DCs não devem aparecer como dispositivos no Entra
+❌ CN=Users            ← Administrator, KRBTGT
+❌ CN=Computers        ← container padrão
+❌ OU=Domain Controllers ← DCs não devem virar dispositivos
+✓ OU=COMPUTADORES (Matriz e BH) ← só se for testar Hybrid Join
 ```
  
 **Contas que nunca devem ser sincronizadas:**
