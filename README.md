@@ -96,8 +96,8 @@
 | 📂 Fase 3 | [Print Server e Automação (GPO)](#16-mapeamento-automático-de-unidades-via-gpo) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Conectividade Matriz/Filial (DFS-R, VPN & BranchCache)](docs/fase3-conectividade-filial/fase3-conectividade-filial.md) | ⚠️ Em documentação |
 | 📂 Fase 3 | [Disaster Recovery (WAC, VSS e Backup)](docs/fase3-disaster-recovery/fase3-disaster-recovery.md) | ⚠️ Em documentação |
-| ☁️ Fase 4 | [Identidade Híbrida: Azure AD / Entra ID e Sincronização](docs/fase4-nuvem-hibrida/fase4-nuvem-hibrida.md) | 🔄 Em andamento |
-
+| ☁️ Fase 4 | [Identidade Híbrida: Azure AD / Entra ID e Sincronização](docs/fase4-nuvem-hibrida/fase4-nuvem-hibrida.md) | ✅ Concluído |
+| ☁️ Fase 5 | [Gestão de Identidades Cloud (Modern Workspace)](docs/fase-5-gestão-de-identidades-cloud-e-modern-workspace/fase-5-gestão-de-identidades-cloud-e-modern-workspace.md) | 🔄 Em andamento |
 ---
 
 ## 🟢 Fase 1: Fundação, Topologia e Automação
