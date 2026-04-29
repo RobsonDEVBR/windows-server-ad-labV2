@@ -33,7 +33,7 @@ A diferença principal em relação ao Cloud Sync: o Connect Classic instala um 
 |-----------|-----------|
 | [![7](img/7.png)](img/7.png) | Instalação com configuração expressa — SQL Express instalado localmente junto com o motor de sync |
 | [![8](img/8.png)](img/8.png) | Aviso de UPN: o sufixo `.local` não é roteável na internet e não existe no tenant do Entra. Para o lab, segui sem correspondência — o login na nuvem vai usar o sufixo padrão do tenant, mas o SID e os atributos do objeto continuam amarrados ao AD local |
-| [![9](img/9.png)](img/9.png) | Wizard configurando permissões de leitura e escrita no AD e preparando o motor de exportação |
+| [![9](img/9.png)](img/9.png) | Wizard configurado |
 | [![10](img/10.png)](img/10.png) | Synchronization Service Manager mostrando **Success** em todas as etapas de Import e Export |
 
 ---
