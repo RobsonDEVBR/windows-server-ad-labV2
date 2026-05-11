@@ -466,7 +466,14 @@ Windows Admin Center (WAC) como painel centralizado, VSS para snapshots consiste
 - [ ] PowerShell IaC — automação completa do provisionamento do lab
 
 ---
+## 👨‍💻 Autor
 
+**Robson Silva Pereira**
+Analista de Infraestrutura | Belo Horizonte, MG
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-robson--silva--pereira-0077B5?style=flat&logo=linkedin)](https://www.linkedin.com/in/robson-silva-pereira/)
+[![GitHub](https://img.shields.io/badge/GitHub-RobsonDEVBR-181717?style=flat&logo=github)](https://github.com/RobsonDEVBR)
+---
 <p align="center">
   <sub>Documentação viva — atualizada conforme o lab evolui.</sub>
 </p>
